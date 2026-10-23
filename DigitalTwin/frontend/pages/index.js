@@ -123,6 +123,19 @@ export default function Home() {
     }
   };
 
+  const handleDemoScene = async (scene) => {
+    try {
+      await fetch(`${BACKEND_URL}/api/demo-scene`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scene })
+      });
+      await fetchFarmState(false);
+    } catch (err) {
+      console.error('Error setting demo scene:', err);
+    }
+  };
+
   const handleSetWeather = async (condition) => {
     try {
       const res = await fetch(`${BACKEND_URL}/api/weather`, {
@@ -454,6 +467,11 @@ export default function Home() {
                   <Flame size={16} color="#f43f5e" />
                   <span>Heatwave Solar</span>
                 </button>
+                {['DRY', 'HAPPY', 'RAIN', 'STORM', 'FUNGAL', 'LIVE'].map((s) => (
+                  <button key={s} onClick={() => handleDemoScene(s)} className="btn">
+                    <span>{s}</span>
+                  </button>
+                ))}
               </div>
             </div>
           </section>
@@ -469,6 +487,7 @@ export default function Home() {
                   zones={farmState?.zones || []}
                   selectedZoneId={selectedZoneId}
                   onSelectZone={setSelectedZoneId}
+                  weather={weather}
                 />
               </div>
             </div>

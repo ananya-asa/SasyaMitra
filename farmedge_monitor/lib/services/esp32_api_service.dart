@@ -49,4 +49,8 @@ class Esp32ApiService {
   Future<void> clearAlert(String zone) async {
     await _dio.post<dynamic>('/api/zone/$zone/alert', data: {'alert': 'NONE'});
   }
+
+  Future<void> pushDemoScene(String scene) async {
+    await _dio.post<dynamic>('/api/demo-scene', data: {'scene': scene});
+  }
 }

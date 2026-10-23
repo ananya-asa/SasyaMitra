@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/constants/app_constants.dart';
 import '../core/farm/crop_id.dart';
+import '../core/farm/demo_scene.dart';
 import '../core/farm/farmer_state.dart';
 import '../models/farm_status.dart';
 import '../services/esp32_api_service.dart';
@@ -156,15 +157,23 @@ class FarmState {
   final String? lastError;
   final DateTime? lastPollAt;
 
-  FarmerFarmState get farmer {
+  FarmerFarmState farmerFor(DemoScene scene) {
+    final paddy = scene == DemoScene.live
+        ? paddyStatus ?? status
+        : statusForScene(scene, CropId.paddy, paddyStatus ?? status);
+    final areca = scene == DemoScene.live
+        ? arecaStatus
+        : statusForScene(scene, CropId.arecanut, arecaStatus);
     return FarmerFarmState.fromStatuses(
-      paddyStatus: paddyStatus ?? status,
-      arecaStatus: arecaStatus,
-      pressureHistory: pressureHistory,
+      paddyStatus: paddy,
+      arecaStatus: areca,
+      pressureHistory: scene == DemoScene.storm ? [1015, 988] : pressureHistory,
       isOnline: isOnline,
-      forceDemo: !isOnline,
+      forceDemo: !isOnline || scene != DemoScene.live,
     );
   }
+
+  FarmerFarmState get farmer => farmerFor(DemoScene.live);
 
   factory FarmState.initial() {
     return const FarmState(
@@ -299,24 +308,44 @@ class FarmNotifier extends StateNotifier<FarmState> {
     } catch (_) {}
   }
 
-  Future<void> approveIrrigation() async {
+  Future<void> approveIrrigation({String zone = 'A'}) async {
     final settings = ref.read(settingsProvider);
     if (!settings.loaded) return;
     try {
       final service = Esp32ApiService(baseUrl: settings.baseUrl);
-      await service.toggleIrrigation('A', true);
-      await service.clearAlert('A');
+      await service.updateTriggerMode('CONFIRMATION');
+      await service.toggleIrrigation(zone, true);
+      await service.clearAlert(zone);
       await refresh();
     } catch (_) {}
   }
 
-  Future<void> dismissIrrigationAlert() async {
+  Future<void> dismissIrrigationAlert({String zone = 'A'}) async {
     final settings = ref.read(settingsProvider);
     if (!settings.loaded) return;
     try {
       final service = Esp32ApiService(baseUrl: settings.baseUrl);
-      await service.clearAlert('A');
+      await service.clearAlert(zone);
       await refresh();
+    } catch (_) {}
+  }
+
+  Future<void> stopPump({String zone = 'A'}) async {
+    final settings = ref.read(settingsProvider);
+    if (!settings.loaded) return;
+    try {
+      final service = Esp32ApiService(baseUrl: settings.baseUrl);
+      await service.toggleIrrigation(zone, false);
+      await refresh();
+    } catch (_) {}
+  }
+
+  Future<void> pushDemoScene(DemoScene scene) async {
+    final settings = ref.read(settingsProvider);
+    if (!settings.loaded) return;
+    try {
+      final service = Esp32ApiService(baseUrl: settings.baseUrl);
+      await service.pushDemoScene(scene.apiName);
     } catch (_) {}
   }
 
@@ -329,4 +358,25 @@ class FarmNotifier extends StateNotifier<FarmState> {
 
 final farmProvider = StateNotifierProvider<FarmNotifier, FarmState>((ref) {
   return FarmNotifier(ref);
+});
+
+class DemoSceneNotifier extends StateNotifier<DemoScene> {
+  DemoSceneNotifier(this.ref) : super(DemoScene.live);
+  final Ref ref;
+
+  Future<void> setScene(DemoScene scene) async {
+    state = scene;
+    await ref.read(farmProvider.notifier).pushDemoScene(scene);
+  }
+}
+
+final demoSceneProvider =
+    StateNotifierProvider<DemoSceneNotifier, DemoScene>((ref) {
+  return DemoSceneNotifier(ref);
+});
+
+final farmerViewProvider = Provider<FarmerFarmState>((ref) {
+  final farm = ref.watch(farmProvider);
+  final scene = ref.watch(demoSceneProvider);
+  return farm.farmerFor(scene);
 });

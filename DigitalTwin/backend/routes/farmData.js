@@ -281,6 +281,15 @@ router.get('/weather', async (req, res) => {
  * Dashboard command to change the simulated weather condition.
  * Body payload: { "condition": "SUNNY" | "CLOUDY" | "RAINY" | "HEATWAVE" }
  */
+router.post('/demo-scene', (req, res) => {
+  const { scene } = req.body;
+  const ok = simulator.applyDemoScene(scene);
+  if (!ok) {
+    return res.status(400).json({ error: 'Invalid demo scene' });
+  }
+  res.json({ success: true, scene: scene || 'LIVE' });
+});
+
 router.post('/weather', (req, res) => {
   const { condition } = req.body;
   if (!condition) {

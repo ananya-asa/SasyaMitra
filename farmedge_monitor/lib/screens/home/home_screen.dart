@@ -8,6 +8,7 @@ import '../../core/localization/localization.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/farm_provider.dart';
 import '../../widgets/app_shell.dart';
+import '../../widgets/demo_panel.dart';
 import '../../widgets/status_tile.dart';
 import '../../widgets/verdict_card.dart';
 
@@ -19,7 +20,7 @@ class HomeScreen extends ConsumerWidget {
     final farm = ref.watch(farmProvider);
     final settings = ref.watch(settingsProvider);
     final lang = settings.language;
-    final farmer = farm.farmer;
+    final farmer = ref.watch(farmerViewProvider);
     final width = MediaQuery.sizeOf(context).width;
     final desktop = width >= 1024;
 
@@ -115,18 +116,26 @@ class _HomeHeader extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Text(
-                Localization.t('app_name', language),
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  color: AppTheme.textPrimary,
+              child: GestureDetector(
+                onLongPress: () => showDemoPanel(context),
+                child: Text(
+                  Localization.t('app_name', language),
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    color: AppTheme.textPrimary,
+                  ),
                 ),
               ),
             ),
             Icon(
               isOnline ? Icons.sensors : Icons.sensors_off,
               color: isOnline ? AppTheme.good : AppTheme.watch,
+            ),
+            IconButton(
+              tooltip: 'Demo',
+              onPressed: () => showDemoPanel(context),
+              icon: const Icon(Icons.science_rounded, color: AppTheme.accent),
             ),
           ],
         ),

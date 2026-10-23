@@ -11,7 +11,7 @@ class CropsListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final farm = ref.watch(farmProvider);
+    final farmer = ref.watch(farmerViewProvider);
     final lang = ref.watch(settingsProvider).language;
     return SafeArea(
       child: ListView(
@@ -26,9 +26,9 @@ class CropsListScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          CropSummaryCard(slice: farm.farmer.arecanut, language: lang),
+          CropSummaryCard(slice: farmer.arecanut, language: lang),
           const SizedBox(height: 12),
-          CropSummaryCard(slice: farm.farmer.paddy, language: lang),
+          CropSummaryCard(slice: farmer.paddy, language: lang),
         ],
       ),
     );
