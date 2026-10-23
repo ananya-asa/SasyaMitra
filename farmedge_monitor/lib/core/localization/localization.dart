@@ -1,321 +1,211 @@
-import '../../core/farm/farmer_state.dart';
 import '../../providers/farm_provider.dart';
 
-/// Kannada-first copy. English is the toggle language.
-/// TODO: verify with a native speaker — every Kannada string below.
 class Localization {
   static const Map<String, Map<AppLanguage, String>> _keys = {
-    'app_name': {
-      AppLanguage.en: 'SasyaMitra',
-      AppLanguage.ml: 'സസ്യമിത്ര',
-      AppLanguage.kn: 'ಸಸ್ಯಮಿತ್ರ', // TODO: verify with a native speaker
-    },
-    'nav_home': {
-      AppLanguage.en: 'Home',
-      AppLanguage.ml: 'ഹോം',
-      AppLanguage.kn: 'ಮನೆ', // TODO: verify with a native speaker
-    },
-    'nav_crops': {
-      AppLanguage.en: 'My crops',
-      AppLanguage.ml: 'വിളകൾ',
-      AppLanguage.kn: 'ನನ್ನ ಬೆಳೆ', // TODO: verify with a native speaker
-    },
-    'nav_alerts': {
-      AppLanguage.en: 'Alerts',
-      AppLanguage.ml: 'മുന്നറിയിപ്പ്',
-      AppLanguage.kn: 'ಎಚ್ಚರಿಕೆ', // TODO: verify with a native speaker
-    },
-    'nav_workers': {
-      AppLanguage.en: 'Workers',
-      AppLanguage.ml: 'തൊഴിലാളികൾ',
-      AppLanguage.kn: 'ಕೆಲಸಗಾರರು', // TODO: verify with a native speaker
-    },
-    'lang_en': {
-      AppLanguage.en: 'English',
-      AppLanguage.ml: 'English',
-      AppLanguage.kn: 'English',
-    },
-    'lang_kn': {
-      AppLanguage.en: 'ಕನ್ನಡ',
-      AppLanguage.ml: 'ಕನ್ನಡ',
-      AppLanguage.kn: 'ಕನ್ನಡ',
-    },
-    'paddy': {
-      AppLanguage.en: 'Paddy',
-      AppLanguage.ml: 'നെല്ല്',
-      AppLanguage.kn: 'ಭತ್ತ', // TODO: verify with a native speaker
-    },
-    'arecanut': {
-      AppLanguage.en: 'Arecanut',
-      AppLanguage.ml: 'അടയ്ക്ക',
-      AppLanguage.kn: 'ಅಡಿಕೆ', // TODO: verify with a native speaker
-    },
-    'demo_data': {
-      AppLanguage.en: 'Demo data',
-      AppLanguage.ml: 'ഡെമോ ഡാറ്റ',
-      AppLanguage.kn: 'ಡೆಮೊ ದತ್ತಾಂಶ', // TODO: verify with a native speaker
-    },
-    'verdict_storm': {
-      AppLanguage.en: "Don't water. Cover or harvest now.",
-      AppLanguage.ml: 'നനയ്ക്കരുത്. മൂടുക അല്ലെങ്കിൽ വിളവെടുക്കുക.',
-      AppLanguage.kn: 'ನೀರು ಹಾಕಬೇಡಿ. ಮುಚ್ಚಿ ಅಥವಾ ಕೊಯ್ಲು ಮಾಡಿ.', // TODO: verify with a native speaker
-    },
-    'verdict_fungal': {
-      AppLanguage.en: 'Delay watering. Check crop.',
-      AppLanguage.ml: 'നനയ്ക്കൽ നിർത്തുക. വിള പരിശോധിക്കുക.',
-      AppLanguage.kn: 'ನೀರು ತಡೆ. ಬೆಳೆ ನೋಡಿ.', // TODO: verify with a native speaker
-    },
-    'verdict_dry': {
-      AppLanguage.en: 'Water now.',
-      AppLanguage.ml: 'ഇപ്പോൾ നനയ്ക്കുക.',
-      AppLanguage.kn: 'ಈಗ ನೀರು ಹಾಕಿ.', // TODO: verify with a native speaker
-    },
-    'verdict_good': {
-      AppLanguage.en: 'Looking good.',
-      AppLanguage.ml: 'നല്ല നിലയിലാണ്.',
-      AppLanguage.kn: 'ಚೆನ್ನಾಗಿದೆ.', // TODO: verify with a native speaker
-    },
-    'action_storm': {
-      AppLanguage.en: 'See storm steps',
-      AppLanguage.ml: 'നടപടികൾ കാണുക',
-      AppLanguage.kn: 'ಮುಂದಿನ ಹಂತ ನೋಡಿ', // TODO: verify with a native speaker
-    },
-    'action_fungal': {
-      AppLanguage.en: 'Check crop',
-      AppLanguage.ml: 'വിള പരിശോധിക്കുക',
-      AppLanguage.kn: 'ಬೆಳೆ ಪರಿಶೀಲಿಸಿ', // TODO: verify with a native speaker
-    },
-    'action_water': {
-      AppLanguage.en: 'Start watering',
-      AppLanguage.ml: 'നനയ്ക്കുക',
-      AppLanguage.kn: 'ನೀರು ಹಾಕಿ', // TODO: verify with a native speaker
-    },
-    'action_good': {
-      AppLanguage.en: 'See my crops',
-      AppLanguage.ml: 'വിളകൾ കാണുക',
-      AppLanguage.kn: 'ಬೆಳೆ ನೋಡಿ', // TODO: verify with a native speaker
-    },
-    'thirsty': {
-      AppLanguage.en: 'Thirsty',
-      AppLanguage.ml: 'വരണ്ടത്',
-      AppLanguage.kn: 'ಬಾಯಾರಿದೆ', // TODO: verify with a native speaker
-    },
-    'happy': {
-      AppLanguage.en: 'Happy',
-      AppLanguage.ml: 'നല്ലത്',
-      AppLanguage.kn: 'ಸಂತೋಷ', // TODO: verify with a native speaker
-    },
-    'too_wet': {
-      AppLanguage.en: 'Too wet',
-      AppLanguage.ml: 'അധികം നനഞ്ഞത്',
-      AppLanguage.kn: 'ಹೆಚ್ಚು ಒದ್ದೆ', // TODO: verify with a native speaker
-    },
-    'fungal_indicator': {
-      AppLanguage.en: 'Fungal risk indicator',
-      AppLanguage.ml: 'കുമിൾ സൂചകം',
-      AppLanguage.kn: 'ಶಿಲೀಂಧ್ರ ಅಪಾಯ ಸೂಚಕ', // TODO: verify with a native speaker
-    },
-    'storm_risk': {
-      AppLanguage.en: 'Storm risk',
-      AppLanguage.ml: 'കൊടുങ്കാറ്റ് സാധ്യത',
-      AppLanguage.kn: 'ಚಂಡಮಾರುತ ಅಪಾಯ', // TODO: verify with a native speaker
-    },
-    'risk_low': {
-      AppLanguage.en: 'Low',
-      AppLanguage.ml: 'കുറവ്',
-      AppLanguage.kn: 'ಕಡಿಮೆ', // TODO: verify with a native speaker
-    },
-    'risk_watch': {
-      AppLanguage.en: 'Watch',
-      AppLanguage.ml: 'ശ്രദ്ധിക്കുക',
-      AppLanguage.kn: 'ಗಮನಿಸಿ', // TODO: verify with a native speaker
-    },
-    'risk_high': {
-      AppLanguage.en: 'Act now',
-      AppLanguage.ml: 'ഉടൻ നടപടി',
-      AppLanguage.kn: 'ಈಗ ಕ್ರಮ', // TODO: verify with a native speaker
-    },
-    'open_crop': {
-      AppLanguage.en: 'Open crop',
-      AppLanguage.ml: 'വിള തുറക്കുക',
-      AppLanguage.kn: 'ಬೆಳೆ ತೆರೆಯಿರಿ', // TODO: verify with a native speaker
-    },
-    'tile_water': {
-      AppLanguage.en: 'Water',
-      AppLanguage.ml: 'വെള്ളം',
-      AppLanguage.kn: 'ನೀರು', // TODO: verify with a native speaker
-    },
-    'tile_rain': {
-      AppLanguage.en: 'Rain',
-      AppLanguage.ml: 'മഴ',
-      AppLanguage.kn: 'ಮಳೆ', // TODO: verify with a native speaker
-    },
-    'tile_pump': {
-      AppLanguage.en: 'Pump',
-      AppLanguage.ml: 'പമ്പ്',
-      AppLanguage.kn: 'ಪಂಪ್', // TODO: verify with a native speaker
-    },
-    'pump_on': {
-      AppLanguage.en: 'On',
-      AppLanguage.ml: 'ഓൺ',
-      AppLanguage.kn: 'ಚಾಲನೆ', // TODO: verify with a native speaker
-    },
-    'pump_off': {
-      AppLanguage.en: 'Off',
-      AppLanguage.ml: 'ഓഫ്',
-      AppLanguage.kn: 'ನಿಲ್ಲಿಸಿದೆ', // TODO: verify with a native speaker
-    },
-    'approve_pump': {
-      AppLanguage.en: 'Approve pump',
-      AppLanguage.ml: 'പമ്പ് അനുവദിക്കുക',
-      AppLanguage.kn: 'ಪಂಪ್ ಒಪ್ಪಿಸಿ', // TODO: verify with a native speaker
-    },
-    'dismiss_alert': {
-      AppLanguage.en: 'Not now',
-      AppLanguage.ml: 'ഇപ്പോൾ വേണ്ട',
-      AppLanguage.kn: 'ಈಗ ಬೇಡ', // TODO: verify with a native speaker
-    },
-    'no_alerts': {
-      AppLanguage.en: 'No alerts right now.',
-      AppLanguage.ml: 'ഇപ്പോൾ മുന്നറിയിപ്പില്ല.',
-      AppLanguage.kn: 'ಈಗ ಎಚ್ಚರಿಕೆ ಇಲ್ಲ.', // TODO: verify with a native speaker
-    },
-    'my_workers': {
-      AppLanguage.en: 'My workers',
-      AppLanguage.ml: 'തൊഴിലാളികൾ',
-      AppLanguage.kn: 'ನನ್ನ ಕೆಲಸಗಾರರು', // TODO: verify with a native speaker
-    },
-    'request_workers': {
-      AppLanguage.en: 'Request workers',
-      AppLanguage.ml: 'തൊഴിലാളികളെ വിളിക്കുക',
-      AppLanguage.kn: 'ಕೆಲಸಗಾರರನ್ನು ಕೇಳಿ', // TODO: verify with a native speaker
-    },
-    'add_worker': {
-      AppLanguage.en: 'Add worker',
-      AppLanguage.ml: 'ചേർക്കുക',
-      AppLanguage.kn: 'ಸೇರಿಸಿ', // TODO: verify with a native speaker
-    },
-    'worker_name': {
-      AppLanguage.en: 'Name',
-      AppLanguage.ml: 'പേര്',
-      AppLanguage.kn: 'ಹೆಸರು', // TODO: verify with a native speaker
-    },
-    'worker_phone': {
-      AppLanguage.en: 'Phone',
-      AppLanguage.ml: 'ഫോൺ',
-      AppLanguage.kn: 'ಫೋನ್', // TODO: verify with a native speaker
-    },
-    'demo_panel': {
-      AppLanguage.en: 'Demo scenes',
-      AppLanguage.ml: 'ഡെമോ',
-      AppLanguage.kn: 'ಡೆಮೊ ದೃಶ್ಯ', // TODO: verify with a native speaker
-    },
-    'scene_dry': {
-      AppLanguage.en: 'Dry',
-      AppLanguage.ml: 'വരണ്ടത്',
-      AppLanguage.kn: 'ಒಣ', // TODO: verify with a native speaker
-    },
-    'scene_happy': {
-      AppLanguage.en: 'Happy',
-      AppLanguage.ml: 'നല്ലത്',
-      AppLanguage.kn: 'ಸಂತೋಷ', // TODO: verify with a native speaker
-    },
-    'scene_rain': {
-      AppLanguage.en: 'Rain coming',
-      AppLanguage.ml: 'മഴ വരുന്നു',
-      AppLanguage.kn: 'ಮಳೆ ಬರುತ್ತಿದೆ', // TODO: verify with a native speaker
-    },
-    'scene_storm': {
-      AppLanguage.en: 'Storm',
-      AppLanguage.ml: 'കൊടുങ്കാറ്റ്',
-      AppLanguage.kn: 'ಚಂಡಮಾರುತ', // TODO: verify with a native speaker
-    },
-    'scene_fungal': {
-      AppLanguage.en: 'Fungal risk high',
-      AppLanguage.ml: 'കുമിൾ അപകടം',
-      AppLanguage.kn: 'ಶಿಲೀಂಧ್ರ ಅಪಾಯ ಹೆಚ್ಚು', // TODO: verify with a native speaker
-    },
-    'clear_demo': {
-      AppLanguage.en: 'Use live data',
-      AppLanguage.ml: 'ലൈവ് ഡാറ്റ',
-      AppLanguage.kn: 'ಲೈವ್ ದತ್ತಾಂಶ', // TODO: verify with a native speaker
-    },
-    'offline': {
-      AppLanguage.en: 'Device offline',
-      AppLanguage.ml: 'ഓഫ്‌ലൈൻ',
-      AppLanguage.kn: 'ಸಾಧನ ಆಫ್‌ಲೈನ್', // TODO: verify with a native speaker
-    },
-    'live': {
-      AppLanguage.en: 'Live',
-      AppLanguage.ml: 'ലൈവ്',
-      AppLanguage.kn: 'ಲೈವ್', // TODO: verify with a native speaker
-    },
-    // Kept for older screens still in the tree
+    // Nav Rail
     'overview': {
-      AppLanguage.en: 'Home',
-      AppLanguage.ml: 'ഹോം',
-      AppLanguage.kn: 'ಮನೆ',
+      AppLanguage.en: 'Overview',
+      AppLanguage.ml: 'അവലോകനം',
+      AppLanguage.kn: 'ಅವಲೋಕನ'
     },
     'details': {
       AppLanguage.en: 'Details',
       AppLanguage.ml: 'വിശദാംശങ്ങൾ',
-      AppLanguage.kn: 'ವಿವರಗಳು',
+      AppLanguage.kn: 'ವಿವರಗಳು'
+    },
+    'advisor': {
+      AppLanguage.en: 'Advisor',
+      AppLanguage.ml: 'ഉപദേശകൻ',
+      AppLanguage.kn: 'ಸಲಹೆಗಾರ'
     },
     'settings': {
       AppLanguage.en: 'Settings',
       AppLanguage.ml: 'ക്രമീകരണങ്ങൾ',
-      AppLanguage.kn: 'ಸಂಯೋಜನೆಗಳು',
+      AppLanguage.kn: 'ಸಂಯೋಜನೆಗಳು'
     },
-    'my_crops': {
-      AppLanguage.en: 'My crops',
-      AppLanguage.ml: 'വിളകൾ',
-      AppLanguage.kn: 'ನನ್ನ ಬೆಳೆ',
+    // Titles
+    'farm_overview': {
+      AppLanguage.en: 'Farm Overview',
+      AppLanguage.ml: 'ഫാം അവലോകനം',
+      AppLanguage.kn: 'ಫಾರ್ಮ್ ಅವಲೋಕನ'
+    },
+    'telemetry_data': {
+      AppLanguage.en: 'Telemetry Data',
+      AppLanguage.ml: 'ടെലിമെട്രി ഡാറ്റ',
+      AppLanguage.kn: 'ಟೆಲಿಮೆಟ್ರಿ ಡೇಟಾ'
+    },
+    'view_all_sensors': {
+      AppLanguage.en: 'View All Sensors',
+      AppLanguage.ml: 'എല്ലാ സെൻസറുകളും കാണുക',
+      AppLanguage.kn: 'ಎಲ್ಲಾ ಸೆನ್ಸಾರ್‌ಗಳನ್ನು ನೋಡಿ'
+    },
+    // Cards
+    'soil_moisture': {
+      AppLanguage.en: 'Soil Moisture',
+      AppLanguage.ml: 'മണ്ണിലെ ഈർപ്പം',
+      AppLanguage.kn: 'ಮಣ್ಣಿನ ತೇವಾಂಶ'
+    },
+    'temperature': {
+      AppLanguage.en: 'Temperature',
+      AppLanguage.ml: 'താപനില',
+      AppLanguage.kn: 'ತಾಪಮಾನ'
+    },
+    'humidity': {
+      AppLanguage.en: 'Humidity',
+      AppLanguage.ml: 'അന്തരീക്ഷ ഈർപ്പം',
+      AppLanguage.kn: 'ಆರ್ದ್ರತೆ'
+    },
+    'battery': {
+      AppLanguage.en: 'Battery',
+      AppLanguage.ml: 'ബാറ്ററി',
+      AppLanguage.kn: 'ಬ್ಯಾಟರಿ'
+    },
+    'air_pressure': {
+      AppLanguage.en: 'Air Pressure',
+      AppLanguage.ml: 'വായു മർദ്ദം',
+      AppLanguage.kn: 'ವಾಯು ಒತ್ತಡ'
+    },
+    'rain': {
+      AppLanguage.en: 'Rain',
+      AppLanguage.ml: 'മഴ',
+      AppLanguage.kn: 'ಮಳೆ'
+    },
+    'pump_status': {
+      AppLanguage.en: 'Pump Status',
+      AppLanguage.ml: 'പമ്പ് നില',
+      AppLanguage.kn: 'ಪಂಪ್ ಸ್ಥಿತಿ'
+    },
+    'weather_api': {
+      AppLanguage.en: 'Weather API',
+      AppLanguage.ml: 'കാലാവസ്ഥ API',
+      AppLanguage.kn: 'ಹವಾಮಾನ API'
+    },
+    'edge_ml_forecast': {
+      AppLanguage.en: 'Edge ML Forecast',
+      AppLanguage.ml: 'എഡ്ജ് ML പ്രവചനം',
+      AppLanguage.kn: 'ಎಡ್ಜ್ ML ಮುನ್ಸೂಚನೆ'
+    },
+    'crop_stress_index': {
+      AppLanguage.en: 'Crop Stress Index',
+      AppLanguage.ml: 'വിള സമ്മർദ്ദ സൂചിക',
+      AppLanguage.kn: 'ಬೆಳೆ ಒತ್ತಡದ ಸೂಚ್ಯಂಕ'
+    },
+    'environmental_trends': {
+      AppLanguage.en: 'Environmental Trends',
+      AppLanguage.ml: 'പരിസ്ഥിതി പ്രവണതകൾ',
+      AppLanguage.kn: 'ಪರಿಸರ ಪ್ರವೃತ್ತಿಗಳು'
+    },
+    'live_sync_active': {
+      AppLanguage.en: 'Live Sync Active',
+      AppLanguage.ml: 'തത്സമയ സമന്വയം സജീവമാണ്',
+      AppLanguage.kn: 'ಲೈವ್ ಸಿಂಕ್ സಕ್ರಿಯವಾಗಿದೆ'
+    },
+    'offline_cache': {
+      AppLanguage.en: 'Offline Cache',
+      AppLanguage.ml: 'ഓഫ്‌ലൈൻ കാഷെ',
+      AppLanguage.kn: 'ಆಫ್‌ಲೈನ್ ക്യാಶ್'
+    },
+    'search_farm_data': {
+      AppLanguage.en: 'Search farm data...',
+      AppLanguage.ml: 'ഫാം വിവരങ്ങൾ തിരയുക...',
+      AppLanguage.kn: 'ಫಾರ್ಮ್ ಡೇಟಾ ಹುಡುಕಿ...'
+    },
+    // Dialog / Actions
+    'ai_tomorrow': {
+      AppLanguage.en: 'AI Tomorrow',
+      AppLanguage.ml: 'നാളെത്തെ പ്രവചനം',
+      AppLanguage.kn: 'ನಾಳೆಯ ಮುನ್ಸೂಚನೆ'
+    },
+    'ask_ai_advisor': {
+      AppLanguage.en: 'Ask AI Advisor',
+      AppLanguage.ml: 'AI ഉപദേശകനോട് ചോദിക്കുക',
+      AppLanguage.kn: 'AI ಸಲಹೆಗಾರರನ್ನು ಕೇಳಿ'
+    },
+    // Crop Status / Advisories
+    'low': {
+      AppLanguage.en: 'LOW',
+      AppLanguage.ml: 'കുറഞ്ഞത്',
+      AppLanguage.kn: 'ಕಡಿಮೆ'
+    },
+    'medium': {
+      AppLanguage.en: 'MEDIUM',
+      AppLanguage.ml: 'മിതമായി',
+      AppLanguage.kn: 'ಮಧ್ಯಮ'
+    },
+    'high': {
+      AppLanguage.en: 'HIGH',
+      AppLanguage.ml: 'കൂടുതൽ',
+      AppLanguage.kn: 'ಹೆಚ್ಚು'
+    },
+    'stable': {
+      AppLanguage.en: 'STABLE',
+      AppLanguage.ml: 'സ്ഥിരതയുള്ളത്',
+      AppLanguage.kn: 'ಸ್ಥಿರವಾಗಿದೆ'
+    },
+    'flowing': {
+      AppLanguage.en: 'FLOWING',
+      AppLanguage.ml: 'പ്രവഹിക്കുന്നു',
+      AppLanguage.kn: 'ಹರಿಯುತ್ತಿದೆ'
+    },
+    'idle': {
+      AppLanguage.en: 'IDLE',
+      AppLanguage.ml: 'നിഷ്‌ക്രിയം',
+      AppLanguage.kn: 'ಬಂದ್ ಆಗಿದೆ'
+    },
+    'clear': {
+      AppLanguage.en: 'Clear',
+      AppLanguage.ml: 'തെളിഞ്ഞത്',
+      AppLanguage.kn: 'ಸ್ಪಷ್ಟವಾಗಿದೆ'
+    },
+    'rain_detected': {
+      AppLanguage.en: 'Rain',
+      AppLanguage.ml: 'മഴ',
+      AppLanguage.kn: 'ಮಳೆ ಬರುತಿದೆ'
+    },
+    // Metrics
+    'measured_moisture': {
+      AppLanguage.en: 'Measured Moisture',
+      AppLanguage.ml: 'അളന്ന ഈർപ്പം',
+      AppLanguage.kn: 'ಅಳೆದ ತೇವಾಂಶ'
+    },
+    'target_baseline': {
+      AppLanguage.en: 'Target Baseline',
+      AppLanguage.ml: 'ലക്ഷ്യ പരിധി',
+      AppLanguage.kn: 'ಗುರಿ ಬೇಸ್‌ಲೈನ್'
+    },
+    'stress_category': {
+      AppLanguage.en: 'Stress Category',
+      AppLanguage.ml: 'സമ്മർദ്ദ വിഭാഗം',
+      AppLanguage.kn: 'ಒತ್ತಡದ ವರ್ಗ'
+    },
+    'ai_confidence': {
+      AppLanguage.en: 'AI Model Confidence',
+      AppLanguage.ml: 'AI മാതൃക ഉറപ്പ്',
+      AppLanguage.kn: 'AI ಮಾದರಿ ನಿಖರತೆ'
+    },
+    'air_temperature': {
+      AppLanguage.en: 'Air Temperature',
+      AppLanguage.ml: 'വായു താപനില',
+      AppLanguage.kn: 'ಗಾಳಿಯ ತಾಪಮಾನ'
+    },
+    'air_humidity': {
+      AppLanguage.en: 'Air Humidity',
+      AppLanguage.ml: 'വായു ഈർപ്പം',
+      AppLanguage.kn: 'ಗಾಳಿಯ ಆರ್ದ್ರತೆ'
+    },
+    'pump_switch': {
+      AppLanguage.en: 'Pump Switch State',
+      AppLanguage.ml: 'പമ്പ് സ്വിച്ച് നില',
+      AppLanguage.kn: 'ಪಂಪ್ ಸ್ವಿಚ್ ಸ್ಥಿತಿ'
+    },
+    'trigger_mode': {
+      AppLanguage.en: 'Smart Trigger Mode',
+      AppLanguage.ml: 'സ്മാർട്ട് ട്രിഗർ മോഡ്',
+      AppLanguage.kn: 'ಸ್ಮಾರ್ಟ್ ಟ್ರಿಗರ್ ಮೋಡ್'
     },
   };
 
   static String translate(String key, AppLanguage lang) {
-    final row = _keys[key];
-    if (row == null) return key;
-    return row[lang] ?? row[AppLanguage.kn] ?? key;
-  }
-
-  static String t(String key, AppLanguage lang) => translate(key, lang);
-
-  static String cropName(CropSlice slice, AppLanguage lang) {
-    return slice.crop.name == 'arecanut' ? t('arecanut', lang) : t('paddy', lang);
-  }
-
-  static String verdictLine(VerdictKind kind, AppLanguage lang) {
-    return switch (kind) {
-      VerdictKind.storm => t('verdict_storm', lang),
-      VerdictKind.fungal => t('verdict_fungal', lang),
-      VerdictKind.dry => t('verdict_dry', lang),
-      VerdictKind.good => t('verdict_good', lang),
-    };
-  }
-
-  static String verdictAction(VerdictKind kind, AppLanguage lang) {
-    return switch (kind) {
-      VerdictKind.storm => t('action_storm', lang),
-      VerdictKind.fungal => t('action_fungal', lang),
-      VerdictKind.dry => t('action_water', lang),
-      VerdictKind.good => t('action_good', lang),
-    };
-  }
-
-  static String soilWord(SoilMood mood, AppLanguage lang) {
-    return switch (mood) {
-      SoilMood.thirsty => t('thirsty', lang),
-      SoilMood.happy => t('happy', lang),
-      SoilMood.tooWet => t('too_wet', lang),
-    };
-  }
-
-  static String fungalWord(FungalBand band, AppLanguage lang) {
-    return switch (band) {
-      FungalBand.low => t('risk_low', lang),
-      FungalBand.watch => t('risk_watch', lang),
-      FungalBand.high => t('risk_high', lang),
-    };
+    return _keys[key]?[lang] ?? key;
   }
 }

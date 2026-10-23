@@ -4,9 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/constants/app_constants.dart';
-import '../core/farm/crop_id.dart';
-import '../core/farm/demo_scene.dart';
-import '../core/farm/farmer_state.dart';
 import '../models/farm_status.dart';
 import '../services/esp32_api_service.dart';
 
@@ -64,7 +61,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       pollingSeconds: 1,
       darkMode: true,
       temperatureUnit: TemperatureUnit.celsius,
-      language: AppLanguage.kn,
+      language: AppLanguage.en,
       smartTriggerMode: 'AUTOMATED',
       loaded: false,
     );
@@ -80,7 +77,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         prefs.getString('temperatureUnit') ?? TemperatureUnit.celsius.name,
       ),
       language: AppLanguage.values.byName(
-        prefs.getString('language') ?? AppLanguage.kn.name,
+        prefs.getString('language') ?? AppLanguage.en.name,
       ),
       smartTriggerMode: prefs.getString('smartTriggerMode') ?? 'AUTOMATED',
       loaded: true,
@@ -137,10 +134,7 @@ class FarmSample {
 class FarmState {
   const FarmState({
     required this.status,
-    required this.paddyStatus,
-    required this.arecaStatus,
     required this.history,
-    required this.pressureHistory,
     required this.isOnline,
     required this.isLoading,
     required this.lastError,
@@ -148,40 +142,16 @@ class FarmState {
   });
 
   final FarmStatus? status;
-  final FarmStatus? paddyStatus;
-  final FarmStatus? arecaStatus;
   final List<FarmSample> history;
-  final List<double> pressureHistory;
   final bool isOnline;
   final bool isLoading;
   final String? lastError;
   final DateTime? lastPollAt;
 
-  FarmerFarmState farmerFor(DemoScene scene) {
-    final paddy = scene == DemoScene.live
-        ? paddyStatus ?? status
-        : statusForScene(scene, CropId.paddy, paddyStatus ?? status);
-    final areca = scene == DemoScene.live
-        ? arecaStatus
-        : statusForScene(scene, CropId.arecanut, arecaStatus);
-    return FarmerFarmState.fromStatuses(
-      paddyStatus: paddy,
-      arecaStatus: areca,
-      pressureHistory: scene == DemoScene.storm ? [1015, 988] : pressureHistory,
-      isOnline: isOnline,
-      forceDemo: !isOnline || scene != DemoScene.live,
-    );
-  }
-
-  FarmerFarmState get farmer => farmerFor(DemoScene.live);
-
   factory FarmState.initial() {
     return const FarmState(
       status: null,
-      paddyStatus: null,
-      arecaStatus: null,
       history: [],
-      pressureHistory: [],
       isOnline: false,
       isLoading: true,
       lastError: null,
@@ -191,10 +161,7 @@ class FarmState {
 
   FarmState copyWith({
     FarmStatus? status,
-    FarmStatus? paddyStatus,
-    FarmStatus? arecaStatus,
     List<FarmSample>? history,
-    List<double>? pressureHistory,
     bool? isOnline,
     bool? isLoading,
     String? lastError,
@@ -203,10 +170,7 @@ class FarmState {
   }) {
     return FarmState(
       status: status ?? this.status,
-      paddyStatus: paddyStatus ?? this.paddyStatus,
-      arecaStatus: arecaStatus ?? this.arecaStatus,
       history: history ?? this.history,
-      pressureHistory: pressureHistory ?? this.pressureHistory,
       isOnline: isOnline ?? this.isOnline,
       isLoading: isLoading ?? this.isLoading,
       lastError: clearError ? null : lastError ?? this.lastError,
@@ -230,13 +194,7 @@ class FarmNotifier extends StateNotifier<FarmState> {
     if (!settings.loaded) return;
     try {
       final service = Esp32ApiService(baseUrl: settings.baseUrl);
-      final results = await Future.wait([
-        service.fetchStatus(zone: CropId.paddy.zoneId),
-        service.fetchStatus(zone: CropId.arecanut.zoneId),
-      ]);
-      final paddy = results[0];
-      final areca = results[1];
-      final status = paddy;
+      final status = await service.fetchStatus();
       final history = [
         ...state.history,
         FarmSample(
@@ -247,20 +205,11 @@ class FarmNotifier extends StateNotifier<FarmState> {
           battery: status.battery,
         ),
       ];
-      final pressureHistory = [
-        ...state.pressureHistory,
-        status.pressure,
-      ];
       state = state.copyWith(
         status: status,
-        paddyStatus: paddy,
-        arecaStatus: areca,
         history: history.length > AppConstants.chartWindow
             ? history.sublist(history.length - AppConstants.chartWindow)
             : history,
-        pressureHistory: pressureHistory.length > 12
-            ? pressureHistory.sublist(pressureHistory.length - 12)
-            : pressureHistory,
         isOnline: true,
         isLoading: false,
         clearError: true,
@@ -308,44 +257,24 @@ class FarmNotifier extends StateNotifier<FarmState> {
     } catch (_) {}
   }
 
-  Future<void> approveIrrigation({String zone = 'A'}) async {
+  Future<void> approveIrrigation() async {
     final settings = ref.read(settingsProvider);
     if (!settings.loaded) return;
     try {
       final service = Esp32ApiService(baseUrl: settings.baseUrl);
-      await service.updateTriggerMode('CONFIRMATION');
-      await service.toggleIrrigation(zone, true);
-      await service.clearAlert(zone);
+      await service.toggleIrrigation('A', true);
+      await service.clearAlert('A');
       await refresh();
     } catch (_) {}
   }
 
-  Future<void> dismissIrrigationAlert({String zone = 'A'}) async {
+  Future<void> dismissIrrigationAlert() async {
     final settings = ref.read(settingsProvider);
     if (!settings.loaded) return;
     try {
       final service = Esp32ApiService(baseUrl: settings.baseUrl);
-      await service.clearAlert(zone);
+      await service.clearAlert('A');
       await refresh();
-    } catch (_) {}
-  }
-
-  Future<void> stopPump({String zone = 'A'}) async {
-    final settings = ref.read(settingsProvider);
-    if (!settings.loaded) return;
-    try {
-      final service = Esp32ApiService(baseUrl: settings.baseUrl);
-      await service.toggleIrrigation(zone, false);
-      await refresh();
-    } catch (_) {}
-  }
-
-  Future<void> pushDemoScene(DemoScene scene) async {
-    final settings = ref.read(settingsProvider);
-    if (!settings.loaded) return;
-    try {
-      final service = Esp32ApiService(baseUrl: settings.baseUrl);
-      await service.pushDemoScene(scene.apiName);
     } catch (_) {}
   }
 
@@ -358,25 +287,4 @@ class FarmNotifier extends StateNotifier<FarmState> {
 
 final farmProvider = StateNotifierProvider<FarmNotifier, FarmState>((ref) {
   return FarmNotifier(ref);
-});
-
-class DemoSceneNotifier extends StateNotifier<DemoScene> {
-  DemoSceneNotifier(this.ref) : super(DemoScene.live);
-  final Ref ref;
-
-  Future<void> setScene(DemoScene scene) async {
-    state = scene;
-    await ref.read(farmProvider.notifier).pushDemoScene(scene);
-  }
-}
-
-final demoSceneProvider =
-    StateNotifierProvider<DemoSceneNotifier, DemoScene>((ref) {
-  return DemoSceneNotifier(ref);
-});
-
-final farmerViewProvider = Provider<FarmerFarmState>((ref) {
-  final farm = ref.watch(farmProvider);
-  final scene = ref.watch(demoSceneProvider);
-  return farm.farmerFor(scene);
 });

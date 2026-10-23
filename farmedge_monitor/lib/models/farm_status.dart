@@ -49,7 +49,7 @@ class FarmStatus {
                     (json['soil_mo_status'] as num?)?.toDouble() ?? 
                     (json['soil_moisture'] as num?)?.toDouble() ?? 0.0,
       battery: (json['battery'] as num?)?.toDouble() ?? 0.0,
-      pump: json['pump'] as bool? ?? json['irrigation'] == 'ON',
+      pump: json['pump'] as bool? ?? (json['irrigation'] == "ON") ?? false,
       rain: json['rain'] as bool? ?? false,
       cropStress: _stressFromJson(json['cropStress'] ?? json['crop_health']),
       pressure: (json['pressure'] as num?)?.toDouble() ?? 
