@@ -142,6 +142,13 @@ function loadState() {
     if (fs.existsSync(STATE_FILE_PATH)) {
       const fileData = fs.readFileSync(STATE_FILE_PATH, 'utf8');
       currentState = JSON.parse(fileData);
+      if (currentState && currentState.zones) {
+        currentState.zones.forEach(z => {
+          if (z.zone_id === 'A') z.crop = 'Paddy';
+          if (z.zone_id === 'B') z.crop = 'Arecanut';
+          if (z.zone_id === 'C') z.crop = 'Paddy (Sec)';
+        });
+      }
       return currentState;
     }
   } catch (error) {
@@ -154,9 +161,9 @@ function loadState() {
     simulation_time: { hour: 8, minute: 0, day_phase: "Morning" },
     weather: { condition: "SUNNY", ambient_temperature: 22.0, ambient_humidity: 60.0, barometric_pressure: 1013.0 },
     zones: [
-      { zone_id: "A", crop: "Tomato", temperature: 22.5, humidity: 58.0, soil_moisture: 80.0, light: 800, irrigation: false, alert: "NONE", battery_capacity_mah: 2000.0, current_draw_ma: 80.0, battery_time_remaining_hours: 25.0, battery: 100.0, crop_health: "HEALTHY", water_requirement: 0.0, weather_forecast: "STABLE" },
-      { zone_id: "B", crop: "Rice", temperature: 21.0, humidity: 70.0, soil_moisture: 85.0, light: 750, irrigation: false, alert: "NONE", battery_capacity_mah: 2000.0, current_draw_ma: 80.0, battery_time_remaining_hours: 25.0, battery: 100.0, crop_health: "HEALTHY", water_requirement: 0.0, weather_forecast: "STABLE" },
-      { zone_id: "C", crop: "Wheat", temperature: 22.0, humidity: 55.0, soil_moisture: 75.0, light: 800, irrigation: false, alert: "NONE", battery_capacity_mah: 2000.0, current_draw_ma: 80.0, battery_time_remaining_hours: 25.0, battery: 100.0, crop_health: "HEALTHY", water_requirement: 0.0, weather_forecast: "STABLE" }
+      { zone_id: "A", crop: "Paddy", temperature: 26.5, humidity: 75.0, soil_moisture: 70.0, light: 800, irrigation: false, alert: "NONE", battery_capacity_mah: 2000.0, current_draw_ma: 80.0, battery_time_remaining_hours: 25.0, battery: 100.0, crop_health: "HEALTHY", water_requirement: 0.0, weather_forecast: "STABLE" },
+      { zone_id: "B", crop: "Arecanut", temperature: 27.0, humidity: 72.0, soil_moisture: 55.0, light: 750, irrigation: false, alert: "NONE", battery_capacity_mah: 2000.0, current_draw_ma: 80.0, battery_time_remaining_hours: 25.0, battery: 100.0, crop_health: "HEALTHY", water_requirement: 0.0, weather_forecast: "STABLE" },
+      { zone_id: "C", crop: "Paddy (Sec)", temperature: 26.0, humidity: 74.0, soil_moisture: 68.0, light: 800, irrigation: false, alert: "NONE", battery_capacity_mah: 2000.0, current_draw_ma: 80.0, battery_time_remaining_hours: 25.0, battery: 100.0, crop_health: "HEALTHY", water_requirement: 0.0, weather_forecast: "STABLE" }
     ],
     logs: [{ timestamp: "08:00:00", message: "Digital Twin Farm Simulation initialized." }],
     smart_trigger_mode: "AUTOMATED"
