@@ -29,14 +29,14 @@ dtrain = xgb.DMatrix(X, label=y, feature_names=features)
 params = {
     'objective': 'multi:softprob',
     'num_class': 3,
-    'max_depth': 3,
-    'eta': 0.1,
+    'max_depth': 7,
+    'eta': 0.25,
     'eval_metric': 'mlogloss',
     'seed': 42
 }
 
-print("[TRAIN] Boosting 15 sequential decision trees across gradient residuals...")
-bst = xgb.train(params, dtrain, num_boost_round=15)
+print("[TRAIN] Boosting 55 sequential decision trees across gradient residuals...")
+bst = xgb.train(params, dtrain, num_boost_round=55)
 
 # Inference
 prob_preds = bst.predict(dtrain)
