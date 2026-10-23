@@ -1,137 +1,226 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
+
+// --- Clean Professional SVG Icons (Lucide-style) ---
+const Icons = {
+  Sprout: ({ size = 20, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M7 20h10" /><path d="M10 20c5.5-2.5.8-6.4 3-10" />
+      <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4.1 5.5.8z" />
+      <path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z" />
+    </svg>
+  ),
+  PalmTree: ({ size = 20, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M13 8c0-2.76-2.46-5-5.5-5S2 5.24 2 8h11z" />
+      <path d="M13 7.14A5.82 5.82 0 0 1 16.5 6c3.04 0 5.5 2.24 5.5 5h-9" />
+      <path d="M5.8 21a14.7 14.7 0 0 1 6.2-12" />
+    </svg>
+  ),
+  Droplets: ({ size = 20, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5c-.29 1.75-1.14 3.12-2.29 4.06S3 11.09 3 12.25c0 2.22 1.8 4.05 4 4.05z" />
+      <path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97" />
+    </svg>
+  ),
+  Thermometer: ({ size = 20, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z" />
+    </svg>
+  ),
+  Wind: ({ size = 20, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2" />
+      <path d="M9.6 4.6A2 2 0 1 1 11 8H2" />
+      <path d="M12.6 19.4A2 2 0 1 0 14 16H2" />
+    </svg>
+  ),
+  Activity: ({ size = 20, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+    </svg>
+  ),
+  Home: ({ size = 20, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
+  Mic: ({ size = 20, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="22" />
+    </svg>
+  ),
+  CheckCircle: ({ size = 16, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
+  ),
+  AlertTriangle: ({ size = 16, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+      <line x1="12" x2="12" y1="9" y2="13" /><line x1="12" x2="12.01" y1="17" y2="17" />
+    </svg>
+  ),
+  AlertCircle: ({ size = 16, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" />
+      <line x1="12" x2="12.01" y1="16" y2="16" />
+    </svg>
+  ),
+  Globe: ({ size = 16, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" x2="22" y1="12" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  ),
+  ChevronRight: ({ size = 16, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <polyline points="9 18 15 12 9 6" />
+    </svg>
+  ),
+  Power: ({ size = 16, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M18.36 6.64a9 9 0 1 1-12.73 0" /><line x1="12" x2="12" y1="2" y2="12" />
+    </svg>
+  ),
+  Send: ({ size = 16, className = "" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <line x1="22" x2="11" y1="2" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+    </svg>
+  )
+};
 
 const TRANSLATIONS = {
   en: {
     appName: "SasyaMitra",
-    appSub: "Coastal Farm Assistant",
+    appSub: "Coastal Agritech Digital Twin",
     langName: "English",
-    farmToday: "YOUR FARM TODAY",
-    heroGood: "Crops are healthy and growing well 🌾",
-    heroWarn: "Attention needed for irrigation ⚠️",
-    heroCrit: "Immediate water attention required! 🚨",
-    heroSub: "Coastal Zone • Live Sensor Monitoring",
-    heroBtn: "Check Irrigation Advice →",
-    myCrops: "My Crops",
-    attentionTitle: "Attention Needed",
-    openFarm: "Open farm →",
+    farmToday: "DAILY FARM OVERVIEW",
+    heroGood: "Crop Conditions are Stable & Healthy",
+    heroWarn: "Irrigation Attention Required",
+    heroCrit: "Critical Moisture Depletion Detected",
+    heroSub: "Coastal Agro-Climatic Zone • Real-Time Telemetry",
+    heroBtn: "Manage Irrigation Systems",
+    myCrops: "Monitored Crops",
+    attentionTitle: "Target Moisture Alert",
+    openFarm: "View Detailed Telemetry",
     soilMoisture: "Soil Moisture",
-    temperature: "Temperature",
-    humidity: "Humidity",
+    temperature: "Ambient Temperature",
+    humidity: "Relative Humidity",
     irrigation: "Irrigation Pump",
-    statusGood: "Optimal ✅",
-    statusCheck: "Needs Water ⚠️",
-    statusCrit: "Dry / Critical 🚨",
-    paddy: "Paddy",
-    paddySub: "Zone A • Lowland wetland",
+    statusGood: "Optimal",
+    statusCheck: "Needs Water",
+    statusCrit: "Critical Deficit",
+    paddy: "Paddy (Rice)",
+    paddySub: "Zone A • Lowland wetland paddy",
     arecanut: "Arecanut",
-    arecanutSub: "Zone B • Coastal plantation",
-    waterAdvice: "See watering advice",
-    turnOn: "Turn ON Pump",
-    turnOff: "Turn OFF Pump",
-    pumpRunning: "Pumping Active",
-    pumpStopped: "Pump Inactive",
-    navHome: "Home",
-    navCrops: "My Crops",
-    navWater: "Water",
-    navSensors: "Sensors",
-    navAsk: "Ask AI",
-    sensorRawTitle: "Live Sensor Readings",
-    sensorSub: "Raw telemetry for agritech & dev farmers",
-    thZone: "Zone",
-    thCrop: "Crop",
-    thMoist: "Moisture",
-    thTemp: "Temp",
+    arecanutSub: "Zone B • High-density coastal plantation",
+    waterAdvice: "Review Irrigation Protocol",
+    turnOn: "Activate Pump",
+    turnOff: "Stop Pump",
+    pumpRunning: "Active / Pumping",
+    pumpStopped: "Standby / Off",
+    navHome: "Dashboard",
+    navCrops: "Crops",
+    navWater: "Irrigation",
+    navSensors: "Telemetry",
+    navAsk: "AI Advisor",
+    sensorRawTitle: "Sensor Matrix Telemetry",
+    sensorSub: "Live hardware sensor readings transmitted to Digital Twin",
+    thZone: "Zone ID",
+    thCrop: "Target Crop",
+    thMoist: "Soil Moisture",
+    thTemp: "Temperature",
     thHum: "Humidity",
-    thPump: "Pump",
-    askTitle: "SasyaMitra Voice Guide",
-    askSub: "Tap the mic and speak in your language",
+    thPump: "Pump Status",
+    askTitle: "Agronomic AI Advisory",
+    askSub: "Ask real-time questions regarding water management, pest prevention, or weather",
     askListening: "Listening... speak now",
-    askPrompt: "Tap to ask about pests, watering, or fertilizer",
-    askThinking: "Analyzing farm data...",
-    sendText: "Ask",
-    inputPlaceholder: "Or type your farm question here...",
-    weatherToday: "Weather",
-    sunny: "Sunny ☀️",
-    rainy: "Rainy 🌧️",
-    cloudy: "Cloudy ⛅",
-    heatwave: "Heatwave 🔥"
+    askPrompt: "Click microphone to ask about coastal crops",
+    askThinking: "Analyzing field sensors & telemetry...",
+    sendText: "Ask AI",
+    inputPlaceholder: "Type your agronomic query here...",
+    weatherToday: "Weather Condition",
+    systemConnected: "Twin Live",
+    targetMoisture: "Target Range: 45% - 65%"
   },
   ml: {
     appName: "സസ്യമിത്ര",
-    appSub: "തീരദേശ കർഷക സഹായി",
+    appSub: "തീരദേശ കാർഷിക ഡിജിറ്റൽ ട്വിൻ",
     langName: "മലയാളം",
-    farmToday: "ഇന്നത്തെ കൃഷിനില",
-    heroGood: "വിളകൾ ആരോഗ്യകരമായി വളരുന്നു 🌾",
-    heroWarn: "നനയ്ക്കുന്നതിൽ ശ്രദ്ധിക്കുക ⚠️",
-    heroCrit: "ഉടൻ വെള്ളം നനയ്ക്കണം! 🚨",
-    heroSub: "തീരദേശ മേഖല • ലൈവ് സെൻസർ നിരീക്ഷണം",
-    heroBtn: "നനയ്ക്കൽ ഉപദേശം കാണുക →",
-    myCrops: "എന്റെ വിളകൾ",
-    attentionTitle: "ശ്രദ്ധിക്കേണ്ട കാര്യം",
-    openFarm: "വിശദാംശങ്ങൾ →",
+    farmToday: "ദൈനംദിന കൃഷി നില",
+    heroGood: "വിളകൾ ആരോഗ്യകരമായ നിലയിലാണ്",
+    heroWarn: "നനയ്ക്കുന്നതിൽ പ്രത്യേക ശ്രദ്ധ വേണം",
+    heroCrit: "ഗുരുതരമായ ഈർപ്പക്കുറവ് കണ്ടെത്തി",
+    heroSub: "തീരദേശ കാർഷിക മേഖല • തത്സമയ സെൻസർ നിരീക്ഷണം",
+    heroBtn: "നനയ്ക്കൽ സംവിധാനം നിയന്ത്രിക്കുക",
+    myCrops: "കൃഷി ചെയ്യുന്ന വിളകൾ",
+    attentionTitle: "ഈർപ്പ നില മുന്നറിയിപ്പ്",
+    openFarm: "വിശദാംശങ്ങൾ കാണുക",
     soilMoisture: "മണ്ണിലെ ഈർപ്പം",
-    temperature: "താപനില",
+    temperature: "അന്തരീക്ഷ താപനില",
     humidity: "അന്തരീക്ഷ ഈർപ്പം",
     irrigation: "നനയ്ക്കൽ പമ്പ്",
-    statusGood: "നല്ല നില ✅",
-    statusCheck: "നനയ്ക്കണം ⚠️",
-    statusCrit: "വളരെ കുറവ് 🚨",
+    statusGood: "നല്ല നില",
+    statusCheck: "നനയ്ക്കണം",
+    statusCrit: "വളരെ കുറവ്",
     paddy: "നെല്ല്",
     paddySub: "മേഖല A • പാടശേഖരം",
     arecanut: "അടയ്ക്ക (കവുങ്ങ്)",
     arecanutSub: "മേഖല B • അടയ്ക്കാത്തോട്ടം",
-    waterAdvice: "നനയ്ക്കൽ നിർദ്ദേശം",
+    waterAdvice: "നനയ്ക്കൽ നിർദ്ദേശം കാണുക",
     turnOn: "പമ്പ് പ്രവർത്തിപ്പിക്കുക",
     turnOff: "പമ്പ് നിർത്തുക",
-    pumpRunning: "പമ്പ് പ്രവർത്തിക്കുന്നു",
-    pumpStopped: "പമ്പ് ഓഫ് ആണ്",
-    navHome: "ഹോം",
+    pumpRunning: "പ്രവർത്തിക്കുന്നു",
+    pumpStopped: "ഓഫ് ആണ്",
+    navHome: "ഡാഷ്‌ബോർഡ്",
     navCrops: "വിളകൾ",
     navWater: "നനയ്ക്കൽ",
-    navSensors: "സെൻസർ",
-    navAsk: "ചോദിക്കൂ",
-    sensorRawTitle: "തത്സമയ സെൻസർ വിവരങ്ങൾ",
-    sensorSub: "വിശദമായ ഡാറ്റാ നിരീക്ഷണം",
+    navSensors: "സെൻസറുകൾ",
+    navAsk: "AI സഹായി",
+    sensorRawTitle: "സെൻസർ വിവരങ്ങൾ",
+    sensorSub: "ഡിജിറ്റൽ ട്വിൻ തത്സമയ ഡാറ്റാ നിരീക്ഷണം",
     thZone: "മേഖല",
     thCrop: "വിള",
     thMoist: "ഈർപ്പം",
-    thTemp: "ചൂട്",
-    thHum: "ഈർപ്പം",
-    thPump: "പമ്പ്",
-    askTitle: "സസ്യമിത്ര വോയ്സ് സഹായി",
-    askSub: "മൈക്ക് അമർത്തി മലയാളത്തിൽ ചോദിക്കൂ",
+    thTemp: "താപനില",
+    thHum: "ആർദ്രത",
+    thPump: "പമ്പ് നില",
+    askTitle: "സസ്യമിത്ര വോയ്സ് & AI സഹായി",
+    askSub: "തീരദേശ കൃഷിയെക്കുറിച്ചുള്ള സംശയങ്ങൾ ചോദിക്കൂ",
     askListening: "ശ്രദ്ധിക്കുന്നു... പറയൂ",
-    askPrompt: "നനയ്ക്കൽ, വളപ്രയോഗം, കീടബാധ എന്നിവ ചോദിക്കൂ",
+    askPrompt: "മൈക്ക് അമർത്തി സംസാരിക്കുക",
     askThinking: "വിവരങ്ങൾ പരിശോധിക്കുന്നു...",
     sendText: "ചോദിക്കൂ",
-    inputPlaceholder: "സംശയം ഇവിടെ ടൈപ്പ് ചെയ്യാം...",
+    inputPlaceholder: "സംശയങ്ങൾ ഇവിടെ ടൈപ്പ് ചെയ്യാം...",
     weatherToday: "കാലാവസ്ഥ",
-    sunny: "വെയിൽ ☀️",
-    rainy: "മഴ 🌧️",
-    cloudy: "മേഘാവൃതം ⛅",
-    heatwave: "കടുത്ത ചൂട് 🔥"
+    systemConnected: "കണക്റ്റഡ്",
+    targetMoisture: "ആവശ്യമായ ഈർപ്പം: 45% - 65%"
   },
   kn: {
     appName: "ಸಸ್ಯಮಿತ್ರ",
-    appSub: "ಕರಾವಳಿ ರೈತ ಸಹಾಯಕ",
+    appSub: "ಕರಾವಳಿ ಡಿಜಿಟಲ್ ಟ್ವಿನ್ ಕೃಷಿ ವೇದಿಕೆ",
     langName: "ಕನ್ನಡ",
-    farmToday: "ಇಂದಿನ ಕೃಷಿ ಸ್ಥಿತಿ",
-    heroGood: "ಬೆಳೆಗಳು ಆರೋಗ್ಯಕರವಾಗಿ ಬೆಳೆಯುತ್ತಿವೆ 🌾",
-    heroWarn: "ನೀರಾವರಿ ಬಗ್ಗೆ ಗಮನಹರಿಸಿ ⚠️",
-    heroCrit: "ತಕ್ಷಣ ನೀರುಣಿಸುವುದು ಅಗತ್ಯ! 🚨",
-    heroSub: "ಕರಾವಳಿ ವಲಯ • ನೇರ ಸೆನ್ಸಾರ್ ಮಾಹಿತಿ",
-    heroBtn: "ನೀರಾವರಿ ಸಲಹೆ ನೋಡಿ →",
-    myCrops: "ನನ್ನ ಬೆಳೆಗಳು",
-    attentionTitle: "ಗಮನಿಸಬೇಕಾದ ಅಂಶ",
-    openFarm: "ವಿವರಗಳು →",
+    farmToday: "ದೈನಂದಿನ ಕೃಷಿ ಅವಲೋಕನ",
+    heroGood: "ಬೆಳೆಗಳು ಆರೋಗ್ಯಕರ ಸ್ಥಿತಿಯಲ್ಲಿವೆ",
+    heroWarn: "ನೀರಾವರಿಯ ಬಗ್ಗೆ ಗಮನಹರಿಸುವುದು ಅಗತ್ಯ",
+    heroCrit: "ತೇವಾಂಶದ ತೀವ್ರ ಕೊರತೆ ಕಂಡುಬಂದಿದೆ",
+    heroSub: "ಕರಾವಳಿ ಕೃಷಿ ವಲಯ • ನೇರ ಸೆನ್ಸಾರ್ ಮಾಹಿತಿ",
+    heroBtn: "ನೀರಾವರಿ ವ್ಯವಸ್ಥೆ ಪರಿಶೀಲಿಸಿ",
+    myCrops: "ಬೆಳೆಗಳ ಸ್ಥಿತಿ",
+    attentionTitle: "ತೇವಾಂಶ ಎಚ್ಚರಿಕೆ",
+    openFarm: "ಪೂರ್ಣ ಮಾಹಿತಿ ನೋಡಿ",
     soilMoisture: "ಮಣ್ಣಿನ ತೇವಾಂಶ",
     temperature: "ತಾಪಮಾನ",
     humidity: "ಗಾಳಿಯ ತೇವಾಂಶ",
     irrigation: "ನೀರಾವರಿ ಪಂಪ್",
-    statusGood: "ಉತ್ತಮವಾಗಿದೆ ✅",
-    statusCheck: "ನೀರು ಬೇಕು ⚠️",
-    statusCrit: "ತುರ್ತು ಗಮನ 🚨",
+    statusGood: "ಉತ್ತಮವಾಗಿದೆ",
+    statusCheck: "ನೀರು ಬೇಕು",
+    statusCrit: "ತುರ್ತು ಗಮನ",
     paddy: "ಭತ್ತ",
     paddySub: "ವಲಯ A • ಗದ್ದೆ ಬೆಳೆ",
     arecanut: "ಅಡಿಕೆ",
@@ -139,33 +228,31 @@ const TRANSLATIONS = {
     waterAdvice: "ನೀರಾವರಿ ಸಲಹೆ ನೋಡಿ",
     turnOn: "ಪಂಪ್ ಆನ್ ಮಾಡಿ",
     turnOff: "ಪಂಪ್ ಆಫ್ ಮಾಡಿ",
-    pumpRunning: "ಪಂಪ್ ಚಾಲನೆಯಲ್ಲಿದೆ",
-    pumpStopped: "ಪಂಪ್ ನಿಂತಿದೆ",
-    navHome: "ಮುಖಪುಟ",
+    pumpRunning: "ಚಾಲನೆಯಲ್ಲಿದೆ",
+    pumpStopped: "ಸ್ಥಗಿತಗೊಂಡಿದೆ",
+    navHome: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
     navCrops: "ಬೆಳೆಗಳು",
     navWater: "ನೀರಾವರಿ",
-    navSensors: "ಸೆನ್ಸರ್",
-    navAsk: "ಪ್ರಶ್ನಿಸಿ",
-    sensorRawTitle: "ಸೆನ್ಸರ್ ರೀಡಿಂಗ್ಸ್",
-    sensorSub: "ನೇರ ತಾಂತ್ರಿಕ ಸೆನ್ಸಾರ್ ಮಾಹಿತಿ",
+    navSensors: "ಟೆಲಿಮೆಟ್ರಿ",
+    navAsk: "AI ಸಲಹೆಗಾರ",
+    sensorRawTitle: "ಸೆನ್ಸರ್ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಡಾಟಾ",
+    sensorSub: "ಡಿಜಿಟಲ್ ಟ್ವಿನ್ ನೇರ ಸಂವೇದಕ ರೀಡಿಂಗ್ಸ್",
     thZone: "ವಲಯ",
     thCrop: "ಬೆಳೆ",
     thMoist: "ತೇವಾಂಶ",
     thTemp: "ತಾಪಮಾನ",
     thHum: "ಆರ್ದ್ರತೆ",
-    thPump: "ಪಂಪ್",
-    askTitle: "ಸಸ್ಯಮಿತ್ರ ಧ್ವನಿ ಸಹಾಯಕ",
-    askSub: "ಮೈಕ್ ಒತ್ತಿ ಕನ್ನಡದಲ್ಲಿ ಮಾತನಾಡಿ",
-    askListening: "ಕೇಳಿಸಿಕೊಳ್ಳುತ್ತಿದೆ... ಮಾತನಾಡಿ",
-    askPrompt: "ಗೊಬ್ಬರ, ಕೀಟಬಾಧೆ, ನೀರುಣಿಸುವ ಬಗ್ಗೆ ಕೇಳಿ",
-    askThinking: "ಮಾಹಿತಿ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...",
-    sendText: "ಪ್ರಶ್ನಿಸಿ",
-    inputPlaceholder: "ನಿಮ್ಮ ಪ್ರಶ್ನೆ ಇಲ್ಲಿ ಬರೆಯಿರಿ...",
+    thPump: "ಪಂಪ್ ಸ್ಥಿತಿ",
+    askTitle: "ಸಸ್ಯಮಿತ್ರ ಧ್ವನಿ ಹಾಗೂ AI ಸಹಾಯಕ",
+    askSub: "ಬೆಳೆ, ರೋಗ ಅಥವಾ ನೀರಾವರಿ ಸಂಬಂಧಿತ ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಿ",
+    askListening: "ಆಲಿಸಲಾಗುತ್ತಿದೆ... ಮಾತನಾಡಿ",
+    askPrompt: "ಧ್ವನಿ ಮೂಲಕ ಪ್ರಶ್ನಿಸಲು ಮೈಕ್ ಒತ್ತಿ",
+    askThinking: "ಮಾಹಿತಿ ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ...",
+    sendText: "ಕೇಳಿ",
+    inputPlaceholder: "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಬರೆಯಿರಿ...",
     weatherToday: "ಹವಾಮಾನ",
-    sunny: "ಬಿಸಿಲು ☀️",
-    rainy: "ಮಳೆ 🌧️",
-    cloudy: "ಮೋಡ ಕವಿದ ⛅",
-    heatwave: "ವಿಪರೀತ ಸೆಕೆ 🔥"
+    systemConnected: "ಸಕ್ರಿಯವಾಗಿದೆ",
+    targetMoisture: "ನಿಗದಿತ ಮಿತಿ: 45% - 65%"
   }
 };
 
@@ -176,11 +263,11 @@ export default function SasyaMitraDashboard() {
   const [farmData, setFarmData] = useState({
     zones: [
       { zone_id: 'A', crop: 'Paddy', soil_moisture: 68, temperature: 28.5, humidity: 76, irrigation: false, alert: 'NORMAL' },
-      { zone_id: 'B', crop: 'Arecanut', soil_moisture: 42, temperature: 29.1, humidity: 74, irrigation: false, alert: 'NORMAL' },
-      { zone_id: 'C', crop: 'Paddy', soil_moisture: 60, temperature: 28.8, humidity: 75, irrigation: false, alert: 'NORMAL' }
+      { zone_id: 'B', crop: 'Arecanut', soil_moisture: 41, temperature: 29.2, humidity: 74, irrigation: false, alert: 'NORMAL' },
+      { zone_id: 'C', crop: 'Paddy', soil_moisture: 62, temperature: 28.8, humidity: 75, irrigation: false, alert: 'NORMAL' }
     ],
     weather: { condition: 'SUNNY', temperature: 29, humidity: 75 },
-    simulation_time: { day: 1, hour: 10 }
+    simulation_time: { day: 1, hour: 11 }
   });
   const [pumpLoading, setPumpLoading] = useState({});
   const [isListening, setIsListening] = useState(false);
@@ -202,7 +289,7 @@ export default function SasyaMitraDashboard() {
           }
         }
       } catch (err) {
-        // Backend fallback keeps simulation alive
+        // Fallback simulation
       }
     };
     fetchData();
@@ -218,15 +305,13 @@ export default function SasyaMitraDashboard() {
     });
   };
 
-  // Find Zone A (Paddy) and Zone B (Arecanut)
   const zoneA = farmData.zones.find(z => z.zone_id === 'A') || farmData.zones[0] || {
-    zone_id: 'A', crop: 'Paddy', soil_moisture: 65, temperature: 28, humidity: 75, irrigation: false
+    zone_id: 'A', crop: 'Paddy', soil_moisture: 68, temperature: 28.5, humidity: 76, irrigation: false
   };
   const zoneB = farmData.zones.find(z => z.zone_id === 'B') || farmData.zones[1] || {
-    zone_id: 'B', crop: 'Arecanut', soil_moisture: 45, temperature: 29, humidity: 72, irrigation: false
+    zone_id: 'B', crop: 'Arecanut', soil_moisture: 41, temperature: 29.2, humidity: 74, irrigation: false
   };
 
-  // Evaluate Crop Status
   const getCropStatus = (zone, cropType) => {
     const moist = Number(zone.soil_moisture || 0);
     if (cropType === 'paddy') {
@@ -234,9 +319,8 @@ export default function SasyaMitraDashboard() {
       if (moist < 55) return { key: 'warning', text: t.statusCheck, color: 'warning', pct: moist };
       return { key: 'good', text: t.statusGood, color: 'good', pct: moist };
     } else {
-      // Arecanut
       if (moist < 30) return { key: 'critical', text: t.statusCrit, color: 'critical', pct: moist };
-      if (moist < 40) return { key: 'warning', text: t.statusCheck, color: 'warning', pct: moist };
+      if (moist < 42) return { key: 'warning', text: t.statusCheck, color: 'warning', pct: moist };
       return { key: 'good', text: t.statusGood, color: 'good', pct: moist };
     }
   };
@@ -246,10 +330,8 @@ export default function SasyaMitraDashboard() {
 
   const hasCritical = paddyStatus.key === 'critical' || arecaStatus.key === 'critical';
   const hasWarning = paddyStatus.key === 'warning' || arecaStatus.key === 'warning';
-
   const heroHeadline = hasCritical ? t.heroCrit : (hasWarning ? t.heroWarn : t.heroGood);
 
-  // Irrigation toggle
   const togglePump = async (zoneId, currentStatus) => {
     setPumpLoading(prev => ({ ...prev, [zoneId]: true }));
     try {
@@ -265,13 +347,12 @@ export default function SasyaMitraDashboard() {
         }));
       }
     } catch (err) {
-      console.error("Failed to toggle irrigation:", err);
+      console.error("Irrigation request failed:", err);
     } finally {
       setPumpLoading(prev => ({ ...prev, [zoneId]: false }));
     }
   };
 
-  // Voice Query Handling
   const handleVoiceAsk = async (textQuery) => {
     const query = textQuery || askQuery;
     if (!query.trim()) return;
@@ -301,11 +382,9 @@ export default function SasyaMitraDashboard() {
           }
         }
       } else {
-        // Fallback intelligent response based on current farm sensors
         generateLocalAdvice(query);
       }
     } catch (err) {
-      // Offline fallback
       generateLocalAdvice(query);
     } finally {
       setIsThinking(false);
@@ -316,28 +395,28 @@ export default function SasyaMitraDashboard() {
     const q = query.toLowerCase();
     if (lang === 'ml') {
       if (q.includes('വെള്ളം') || q.includes('നന') || q.includes('പമ്പ്')) {
-        setAiResponse(`പാടത്ത് ഈർപ്പം ${zoneA.soil_moisture}% ആണ്. അടയ്ക്കാത്തോട്ടത്തിൽ ${zoneB.soil_moisture}% ആണ്. ${zoneB.soil_moisture < 40 ? 'അടയ്ക്കക്ക് 30 മിനിറ്റ് നനയ്ക്കുന്നത് ഉചിതമാണ്.' : 'ഇപ്പോൾ ആവശ്യത്തിന് ഈർപ്പമുണ്ട്.'}`);
+        setAiResponse(`തത്സമയ വിശകലനം: പാടത്ത് മണ്ണിലെ ഈർപ്പം ${zoneA.soil_moisture}% ആണ് (പര്യാപ്തം). അടയ്ക്കാത്തോട്ടത്തിൽ ${zoneB.soil_moisture}% ആണ്. ${zoneB.soil_moisture < 42 ? 'അടയ്ക്കക്ക് 40 മിനിറ്റ് തുള്ളിനന നൽകുന്നത് ഉചിതമാണ്.' : 'നിലവിൽ ഈർപ്പനില അനുയോജ്യമാണ്.'}`);
       } else {
-        setAiResponse(`സസ്യമിത്ര ശുപാർശ: നിലവിൽ അന്തരീക്ഷ താപനില ${zoneA.temperature}°C ആണ്. തീരദേശത്ത് വേനൽ മഴയ്ക്ക് സാധ്യതയുള്ളതിനാൽ ആവശ്യത്തിന് മാത്രം നനയ്ക്കുക.`);
+        setAiResponse(`സസ്യമിത്ര നിർദ്ദേശം: താപനില ${zoneA.temperature}°C, ഈർപ്പം ${zoneA.humidity}%. തീരദേശ വിളകളിൽ കുമിൾരോഗ സാധ്യത ഒഴിവാക്കാൻ വായുസഞ്ചാരം ഉറപ്പാക്കുക.`);
       }
     } else if (lang === 'kn') {
       if (q.includes('ನೀರು') || q.includes('ಪಂಪ್') || q.includes('ತೇವಾಂಶ')) {
-        setAiResponse(`ಭತ್ತದ ಗದ್ದೆಯಲ್ಲಿ ತೇವಾಂಶ ${zoneA.soil_moisture}% ಇದೆ. ಅಡಿಕೆ ತೋಟದಲ್ಲಿ ${zoneB.soil_moisture}% ಇದೆ. ${zoneB.soil_moisture < 40 ? 'ಅಡಿಕೆಗೆ ತಕ್ಷಣ ನೀರುಣಿಸುವುದು ಸೂಕ್ತ.' : 'ತೇವಾಂಶ ತೃಪ್ತಿಕರವಾಗಿದೆ.'}`);
+        setAiResponse(`ಕ್ಷೇತ್ರ ವಿಶ್ಲೇಷಣೆ: ಭತ್ತದ ಗದ್ದೆಯಲ್ಲಿ ತೇವಾಂಶ ${zoneA.soil_moisture}% ಇದೆ. ಅಡಿಕೆ ತೋಟದಲ್ಲಿ ${zoneB.soil_moisture}% ಇದೆ. ${zoneB.soil_moisture < 42 ? 'ಅಡಿಕೆಗೆ ತಕ್ಷಣ ಹನಿ ನೀರಾವರಿ ಚಾಲನೆ ಮಾಡುವುದು ಸೂಕ್ತ.' : 'ತೇವಾಂಶ ಸೂಕ್ತ ಪ್ರಮಾಣದಲ್ಲಿದೆ.'}`);
       } else {
-        setAiResponse(`ಸಸ್ಯಮಿತ್ರ ಸಲಹೆ: ಪ್ರಸ್ತುತ ತಾಪಮಾನ ${zoneA.temperature}°C ಇದೆ. ಕರಾವಳಿ ಹವಾಮಾನಕ್ಕೆ ತಕ್ಕಂತೆ ಅಡಿಕೆ ಗಿಡಗಳ ಬುಡದಲ್ಲಿ ತೇವಾಂಶ ಕಾಪಾಡಿಕೊಳ್ಳಿ.`);
+        setAiResponse(`ಸಸ್ಯಮಿತ್ರ ಕೃಷಿ ಸಲಹೆ: ಪ್ರಸ್ತುತ ತಾಪಮಾನ ${zoneA.temperature}°C ಮತ್ತು ಆರ್ದ್ರತೆ ${zoneA.humidity}%. ಕರಾವಳಿ ಹವಾಗುಣಕ್ಕೆ ತಕ್ಕಂತೆ ಅಡಿಕೆ ತೋಟದಲ್ಲಿ ಬಸಿಗಾಲುವೆ ನಿರ್ವಹಣೆ ಮುಖ್ಯ.`);
       }
     } else {
       if (q.includes('water') || q.includes('pump') || q.includes('irrigation')) {
-        setAiResponse(`Paddy moisture is ${zoneA.soil_moisture}%. Arecanut moisture is ${zoneB.soil_moisture}%. ${zoneB.soil_moisture < 40 ? 'Irrigation is recommended for Arecanut.' : 'Moisture levels are optimal.'}`);
+        setAiResponse(`Digital Twin Telemetry: Paddy field moisture is stable at ${zoneA.soil_moisture}%. Arecanut soil moisture is currently ${zoneB.soil_moisture}%. ${zoneB.soil_moisture < 42 ? 'Scheduled 40-minute drip cycle is recommended for Arecanut.' : 'All root zones have adequate hydration.'}`);
       } else {
-        setAiResponse(`SasyaMitra Advisory: Temperature is ${zoneA.temperature}°C with ${zoneA.humidity}% humidity. Coastal climate is steady.`);
+        setAiResponse(`SasyaMitra Advisory: Ambient temperature is ${zoneA.temperature}°C with relative humidity at ${zoneA.humidity}%. Conditions are conducive for normal coastal growth cycles.`);
       }
     }
   };
 
   const startListening = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert("Speech recognition is not supported in this browser. Please type below.");
+      alert("Speech recognition is unavailable in this environment. You can type your query.");
       return;
     }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -364,484 +443,550 @@ export default function SasyaMitraDashboard() {
   return (
     <>
       <Head>
-        <title>SasyaMitra | Coastal Farmer Assistant</title>
-        <meta name="description" content="AI & Digital Twin Dashboard for Paddy and Arecanut Farmers" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&family=Noto+Sans+Kannada:wght@400;600;700;800&family=Noto+Sans+Malayalam:wght@400;600;700;800&display=swap" rel="stylesheet" />
+        <title>SasyaMitra | Coastal Agritech Platform</title>
+        <meta name="description" content="Professional Digital Twin & Crop Telemetry for Coastal Farmers" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
 
-      <div className="app-shell">
-        {/* Top Header */}
+      <div className="app-wrapper">
+        {/* Professional Header with Desktop Nav */}
         <header className="app-header">
-          <div className="logo-wrap">
-            <div className="logo-icon">🌱</div>
-            <div>
-              <div className="logo-name">{t.appName}</div>
-              <div className="logo-sub">{t.appSub}</div>
+          <div className="app-container">
+            <div className="header-inner">
+              <div className="brand-section">
+                <div className="brand-icon-box">
+                  <Icons.Sprout size={22} />
+                </div>
+                <div>
+                  <div className="brand-name">{t.appName}</div>
+                  <div className="brand-badge">{t.appSub}</div>
+                </div>
+              </div>
+
+              {/* Desktop Tabs */}
+              <nav className="desktop-nav">
+                <button className={`dnav-link ${tab === 'home' ? 'active' : ''}`} onClick={() => setTab('home')}>
+                  <Icons.Home size={16} />
+                  <span>{t.navHome}</span>
+                </button>
+                <button className={`dnav-link ${tab === 'crops' ? 'active' : ''}`} onClick={() => setTab('crops')}>
+                  <Icons.Sprout size={16} />
+                  <span>{t.navCrops}</span>
+                </button>
+                <button className={`dnav-link ${tab === 'water' ? 'active' : ''}`} onClick={() => setTab('water')}>
+                  <Icons.Droplets size={16} />
+                  <span>{t.navWater}</span>
+                </button>
+                <button className={`dnav-link ${tab === 'sensors' ? 'active' : ''}`} onClick={() => setTab('sensors')}>
+                  <Icons.Activity size={16} />
+                  <span>{t.navSensors}</span>
+                </button>
+                <button className={`dnav-link ${tab === 'ask' ? 'active' : ''}`} onClick={() => setTab('ask')}>
+                  <Icons.Mic size={16} />
+                  <span>{t.navAsk}</span>
+                </button>
+              </nav>
+
+              <div className="header-actions">
+                <div className="status-pill">
+                  <span className="status-pulse" />
+                  <span>{t.systemConnected}</span>
+                </div>
+                <button className="lang-btn" onClick={toggleLanguage} title="Switch Language">
+                  <Icons.Globe size={15} />
+                  <span>{t.langName}</span>
+                </button>
+              </div>
             </div>
           </div>
-
-          <button className="lang-pill" onClick={toggleLanguage} title="Switch Language">
-            🌐 {t.langName}
-          </button>
         </header>
 
-        {/* Tab 1: HOME */}
-        {tab === 'home' && (
-          <main className="page-content animate-in">
-            {/* Hero Card */}
-            <div className="hero-card">
-              <div className="hero-eyebrow">{t.farmToday}</div>
-              <h2 className="hero-title">{heroHeadline}</h2>
-              <div className="hero-sub">
-                <span>📍</span> {t.heroSub}
-              </div>
-              <button className="hero-btn" onClick={() => setTab('water')}>
-                {t.heroBtn}
-              </button>
-            </div>
+        {/* Main Content Area */}
+        <main className="main-content">
+          <div className="app-container">
 
-            {/* My Crops Section */}
-            <div className="section-lbl">{t.myCrops}</div>
-            <div className="crops-grid">
-              {/* Paddy Card */}
-              <div
-                className="crop-card"
-                onClick={() => { setSelectedCrop('paddy'); setTab('crops'); }}
-                role="button"
-                tabIndex={0}
-              >
-                <div className="crop-icon-box">🌾</div>
-                <div className="crop-name-en">{t.paddy}</div>
-                <div className="crop-name-loc">{t.paddySub}</div>
-                <div className={`crop-badge ${paddyStatus.color}`}>
-                  <span className={`dot ${paddyStatus.color}`} />
-                  {paddyStatus.text}
-                </div>
-                <div className="crop-open-lnk">
-                  <span>{t.openFarm}</span>
-                  <span>→</span>
-                </div>
-              </div>
+            {/* TAB: DASHBOARD / HOME */}
+            {tab === 'home' && (
+              <div className="animate-fade">
+                {/* Responsive Grid: Hero + Attention Alert */}
+                <div className="dashboard-grid-hero">
+                  {/* Hero Status Panel */}
+                  <div className="hero-overview">
+                    <div>
+                      <div className="hero-badge-tag">
+                        <Icons.Activity size={13} />
+                        <span>{t.farmToday}</span>
+                      </div>
+                      <h1 className="hero-title">{heroHeadline}</h1>
+                      <div className="hero-subtext">
+                        <span>{t.heroSub}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <button className="hero-action-btn" onClick={() => setTab('water')}>
+                        <span>{t.heroBtn}</span>
+                        <Icons.ChevronRight size={16} />
+                      </button>
+                    </div>
+                  </div>
 
-              {/* Arecanut Card */}
-              <div
-                className="crop-card"
-                onClick={() => { setSelectedCrop('arecanut'); setTab('crops'); }}
-                role="button"
-                tabIndex={0}
-              >
-                <div className="crop-icon-box">🌴</div>
-                <div className="crop-name-en">{t.arecanut}</div>
-                <div className="crop-name-loc">{t.arecanutSub}</div>
-                <div className={`crop-badge ${arecaStatus.color}`}>
-                  <span className={`dot ${arecaStatus.color}`} />
-                  {arecaStatus.text}
-                </div>
-                <div className="crop-open-lnk">
-                  <span>{t.openFarm}</span>
-                  <span>→</span>
-                </div>
-              </div>
-            </div>
+                  {/* Attention Alert Card */}
+                  <div className="panel-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div style={{ background: 'var(--warning-pale)', color: 'var(--warning)', padding: 8, borderRadius: 8 }}>
+                            <Icons.AlertTriangle size={18} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '0.92rem', fontWeight: 800 }}>{t.attentionTitle}</div>
+                            <div style={{ fontSize: '0.74rem', color: 'var(--text-3)' }}>{t.arecanut} (Zone B)</div>
+                          </div>
+                        </div>
+                        <span className="metric-badge warning">
+                          <Icons.AlertTriangle size={13} />
+                          <span>{t.statusCheck}</span>
+                        </span>
+                      </div>
 
-            {/* Attention Card */}
-            <div className="card">
-              <div className="alert-row">
-                <div className="alert-icon-box">💧</div>
-                <div>
-                  <h3>{t.attentionTitle}</h3>
-                  <p>{selectedCrop === 'paddy' ? t.paddy : t.arecanut} • {t.soilMoisture}</p>
-                </div>
-              </div>
+                      <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-1)', margin: '8px 0 2px' }}>
+                        {zoneB.soil_moisture}%
+                        <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-3)', marginLeft: 8 }}>
+                          {t.soilMoisture}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--warning)', fontWeight: 600 }}>
+                        {t.targetMoisture}
+                      </div>
 
-              <div className="alert-val">
-                {zoneB.soil_moisture}% <span style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-3)' }}>({t.arecanut})</span>
-              </div>
-              <div className="attn-tag">
-                {zoneB.soil_moisture < 40 ? '⚠️ Lower than required 45%' : '✅ Within healthy limits'}
-              </div>
+                      <div className="progress-track">
+                        <div
+                          className="progress-fill"
+                          style={{
+                            width: `${Math.min(100, zoneB.soil_moisture)}%`,
+                            background: zoneB.soil_moisture < 30 ? 'var(--danger)' : (zoneB.soil_moisture < 42 ? 'var(--warning)' : 'var(--primary-light)')
+                          }}
+                        />
+                      </div>
+                    </div>
 
-              <div className="mbar">
-                <div
-                  className="mbar-fill"
-                  style={{
-                    width: `${Math.min(100, zoneB.soil_moisture)}%`,
-                    background: zoneB.soil_moisture < 30 ? 'var(--danger)' : (zoneB.soil_moisture < 40 ? 'var(--warning)' : 'var(--primary-light)')
-                  }}
-                />
-              </div>
-
-              <button className="cta-btn" onClick={() => setTab('water')}>
-                💧 {t.waterAdvice}
-              </button>
-            </div>
-
-            {/* Quick Weather Snapshot */}
-            <div className="card">
-              <div className="stat-row">
-                <div className="stat-box">
-                  <div className="stat-label">{t.weatherToday}</div>
-                  <div className="stat-val">
-                    {farmData.weather?.condition === 'RAINY' ? t.rainy :
-                     farmData.weather?.condition === 'CLOUDY' ? t.cloudy :
-                     farmData.weather?.condition === 'HEATWAVE' ? t.heatwave : t.sunny}
+                    <button className="secondary-btn" onClick={() => setTab('water')} style={{ width: '100%' }}>
+                      <Icons.Droplets size={16} />
+                      <span>{t.waterAdvice}</span>
+                    </button>
                   </div>
                 </div>
-                <div className="stat-box">
-                  <div className="stat-label">{t.temperature}</div>
-                  <div className="stat-val">{zoneA.temperature}°C</div>
+
+                {/* Monitored Crops Section */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                  <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-1)' }}>{t.myCrops}</h2>
+                  <span style={{ fontSize: '0.76rem', color: 'var(--text-3)', fontWeight: 600 }}>2 Active Agricultural Zones</span>
                 </div>
-                <div className="stat-box">
-                  <div className="stat-label">{t.humidity}</div>
-                  <div className="stat-val">{zoneA.humidity}%</div>
+
+                <div className="crops-responsive-grid">
+                  {/* Paddy Card */}
+                  <div
+                    className="crop-interactive-card"
+                    onClick={() => { setSelectedCrop('paddy'); setTab('crops'); }}
+                  >
+                    <div>
+                      <div className="crop-header">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div className="crop-icon-frame">
+                            <Icons.Sprout size={22} />
+                          </div>
+                          <div>
+                            <div className="crop-name">{t.paddy}</div>
+                            <div className="crop-zone">{t.paddySub}</div>
+                          </div>
+                        </div>
+                        <span className={`metric-badge ${paddyStatus.color}`}>
+                          {paddyStatus.key === 'good' ? <Icons.CheckCircle size={13} /> : <Icons.AlertTriangle size={13} />}
+                          <span>{paddyStatus.text}</span>
+                        </span>
+                      </div>
+
+                      <div className="metric-tile-grid">
+                        <div className="metric-tile">
+                          <div className="metric-tile-lbl">{t.soilMoisture}</div>
+                          <div className="metric-tile-val">{zoneA.soil_moisture}%</div>
+                        </div>
+                        <div className="metric-tile">
+                          <div className="metric-tile-lbl">{t.temperature}</div>
+                          <div className="metric-tile-val">{zoneA.temperature}°C</div>
+                        </div>
+                        <div className="metric-tile">
+                          <div className="metric-tile-lbl">{t.humidity}</div>
+                          <div className="metric-tile-val">{zoneA.humidity}%</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="crop-footer-link">
+                      <span>{t.openFarm}</span>
+                      <Icons.ChevronRight size={16} />
+                    </div>
+                  </div>
+
+                  {/* Arecanut Card */}
+                  <div
+                    className="crop-interactive-card"
+                    onClick={() => { setSelectedCrop('arecanut'); setTab('crops'); }}
+                  >
+                    <div>
+                      <div className="crop-header">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div className="crop-icon-frame">
+                            <Icons.PalmTree size={22} />
+                          </div>
+                          <div>
+                            <div className="crop-name">{t.arecanut}</div>
+                            <div className="crop-zone">{t.arecanutSub}</div>
+                          </div>
+                        </div>
+                        <span className={`metric-badge ${arecaStatus.color}`}>
+                          {arecaStatus.key === 'good' ? <Icons.CheckCircle size={13} /> : <Icons.AlertTriangle size={13} />}
+                          <span>{arecaStatus.text}</span>
+                        </span>
+                      </div>
+
+                      <div className="metric-tile-grid">
+                        <div className="metric-tile">
+                          <div className="metric-tile-lbl">{t.soilMoisture}</div>
+                          <div className="metric-tile-val" style={{ color: arecaStatus.color === 'warning' ? 'var(--warning)' : 'inherit' }}>
+                            {zoneB.soil_moisture}%
+                          </div>
+                        </div>
+                        <div className="metric-tile">
+                          <div className="metric-tile-lbl">{t.temperature}</div>
+                          <div className="metric-tile-val">{zoneB.temperature}°C</div>
+                        </div>
+                        <div className="metric-tile">
+                          <div className="metric-tile-lbl">{t.humidity}</div>
+                          <div className="metric-tile-val">{zoneB.humidity}%</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="crop-footer-link">
+                      <span>{t.openFarm}</span>
+                      <Icons.ChevronRight size={16} />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </main>
-        )}
+            )}
 
-        {/* Tab 2: MY CROPS */}
-        {tab === 'crops' && (
-          <main className="page-content animate-in">
-            {/* Crop switch pills */}
-            <div className="ctabs">
-              <button
-                className={`ctab ${selectedCrop === 'paddy' ? 'active' : ''}`}
-                onClick={() => setSelectedCrop('paddy')}
-              >
-                🌾 {t.paddy} (Zone A)
-              </button>
-              <button
-                className={`ctab ${selectedCrop === 'arecanut' ? 'active' : ''}`}
-                onClick={() => setSelectedCrop('arecanut')}
-              >
-                🌴 {t.arecanut} (Zone B)
-              </button>
-            </div>
+            {/* TAB: CROPS DETAILED */}
+            {tab === 'crops' && (
+              <div className="animate-fade">
+                {/* Crop Switcher */}
+                <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+                  <button
+                    className={selectedCrop === 'paddy' ? 'primary-btn' : 'secondary-btn'}
+                    onClick={() => setSelectedCrop('paddy')}
+                  >
+                    <Icons.Sprout size={16} />
+                    <span>{t.paddy} (Zone A)</span>
+                  </button>
+                  <button
+                    className={selectedCrop === 'arecanut' ? 'primary-btn' : 'secondary-btn'}
+                    onClick={() => setSelectedCrop('arecanut')}
+                  >
+                    <Icons.PalmTree size={16} />
+                    <span>{t.arecanut} (Zone B)</span>
+                  </button>
+                </div>
 
-            {/* Selected Crop Card */}
-            <div className="card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <div>
-                  <h2 style={{ fontSize: '1.2rem', fontWeight: 800 }}>
-                    {selectedCrop === 'paddy' ? t.paddy : t.arecanut}
-                  </h2>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-3)' }}>
-                    {selectedCrop === 'paddy' ? t.paddySub : t.arecanutSub}
+                <div className="panel-card" style={{ marginBottom: 20 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <div>
+                      <h2 style={{ fontSize: '1.3rem', fontWeight: 800 }}>
+                        {selectedCrop === 'paddy' ? t.paddy : t.arecanut}
+                      </h2>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-3)' }}>
+                        {selectedCrop === 'paddy' ? t.paddySub : t.arecanutSub}
+                      </div>
+                    </div>
+                    <span className={`metric-badge ${activeStatus.color}`}>
+                      {activeStatus.key === 'good' ? <Icons.CheckCircle size={13} /> : <Icons.AlertTriangle size={13} />}
+                      <span>{activeStatus.text}</span>
+                    </span>
+                  </div>
+
+                  <div style={{ marginBottom: 18 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 700, marginBottom: 6 }}>
+                      <span>{t.soilMoisture}</span>
+                      <span>{activeZone.soil_moisture}%</span>
+                    </div>
+                    <div className="progress-track" style={{ height: 10 }}>
+                      <div
+                        className="progress-fill"
+                        style={{
+                          width: `${Math.min(100, activeZone.soil_moisture)}%`,
+                          background: activeStatus.color === 'critical' ? 'var(--danger)' : (activeStatus.color === 'warning' ? 'var(--warning)' : 'var(--primary-light)')
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="metric-tile-grid">
+                    <div className="metric-tile">
+                      <div className="metric-tile-lbl">{t.temperature}</div>
+                      <div className="metric-tile-val">{activeZone.temperature}°C</div>
+                    </div>
+                    <div className="metric-tile">
+                      <div className="metric-tile-lbl">{t.humidity}</div>
+                      <div className="metric-tile-val">{activeZone.humidity}%</div>
+                    </div>
+                    <div className="metric-tile">
+                      <div className="metric-tile-lbl">{t.irrigation}</div>
+                      <div className="metric-tile-val" style={{ color: activeZone.irrigation ? 'var(--primary-light)' : 'var(--text-3)' }}>
+                        {activeZone.irrigation ? t.pumpRunning : t.pumpStopped}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  className={`primary-btn ${activeZone.irrigation ? 'danger' : ''}`}
+                  onClick={() => togglePump(activeZone.zone_id, activeZone.irrigation)}
+                  disabled={pumpLoading[activeZone.zone_id]}
+                >
+                  <Icons.Power size={16} />
+                  <span>
+                    {pumpLoading[activeZone.zone_id] ? 'Updating...' : (activeZone.irrigation ? t.turnOff : t.turnOn)}
+                  </span>
+                </button>
+              </div>
+            )}
+
+            {/* TAB: WATER / IRRIGATION */}
+            {tab === 'water' && (
+              <div className="animate-fade">
+                <div style={{ marginBottom: 18 }}>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{t.navWater} Control Center</h2>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-3)' }}>Manage automated and manual drip/flood irrigation circuits</p>
+                </div>
+
+                <div className="crops-responsive-grid">
+                  {/* Paddy Irrigation */}
+                  <div className="panel-card">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                      <div>
+                        <div style={{ fontSize: '1.05rem', fontWeight: 800 }}>{t.paddy} (Zone A)</div>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--text-3)' }}>{t.soilMoisture}: {zoneA.soil_moisture}%</div>
+                      </div>
+                      <button
+                        className={zoneA.irrigation ? 'primary-btn danger' : 'primary-btn'}
+                        onClick={() => togglePump('A', zoneA.irrigation)}
+                        disabled={pumpLoading['A']}
+                      >
+                        <Icons.Power size={15} />
+                        <span>{zoneA.irrigation ? t.pumpRunning : t.turnOn}</span>
+                      </button>
+                    </div>
+
+                    <div className="progress-track">
+                      <div
+                        className="progress-fill"
+                        style={{
+                          width: `${Math.min(100, zoneA.soil_moisture)}%`,
+                          background: zoneA.soil_moisture < 45 ? 'var(--warning)' : 'var(--primary-light)'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Arecanut Irrigation */}
+                  <div className="panel-card">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                      <div>
+                        <div style={{ fontSize: '1.05rem', fontWeight: 800 }}>{t.arecanut} (Zone B)</div>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--text-3)' }}>{t.soilMoisture}: {zoneB.soil_moisture}%</div>
+                      </div>
+                      <button
+                        className={zoneB.irrigation ? 'primary-btn danger' : 'primary-btn'}
+                        onClick={() => togglePump('B', zoneB.irrigation)}
+                        disabled={pumpLoading['B']}
+                      >
+                        <Icons.Power size={15} />
+                        <span>{zoneB.irrigation ? t.pumpRunning : t.turnOn}</span>
+                      </button>
+                    </div>
+
+                    <div className="progress-track">
+                      <div
+                        className="progress-fill"
+                        style={{
+                          width: `${Math.min(100, zoneB.soil_moisture)}%`,
+                          background: zoneB.soil_moisture < 30 ? 'var(--danger)' : (zoneB.soil_moisture < 42 ? 'var(--warning)' : 'var(--primary-light)')
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="panel-card" style={{ background: 'var(--bg-subtle)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    <Icons.Droplets size={18} className="" />
+                    <span style={{ fontSize: '0.9rem', fontWeight: 700 }}>Agronomic Water Advisory</span>
+                  </div>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-2)', lineHeight: 1.6 }}>
+                    {lang === 'ml'
+                      ? "വേനൽക്കാലത്ത് അടയ്ക്കാത്തോട്ടത്തിൽ തുള്ളിനന (Drip irrigation) നൽകുന്നത് 40% വരെ വെള്ളം ലാഭിക്കാൻ സഹായിക്കും. നെൽപാടങ്ങളിൽ കതിരിടുന്ന ഘട്ടത്തിൽ 2-3 സെ.മീ ആഴത്തിൽ ഈർപ്പം നിലനിർത്തുക."
+                      : (lang === 'kn'
+                      ? "ಕರಾವಳಿ ಪ್ರದೇಶದಲ್ಲಿ ಅಡಿಕೆ ತೋಟಕ್ಕೆ ಹನಿ ನೀರಾವರಿ ಪದ್ಧತಿ ಅಳವಡಿಸುವುದರಿಂದ ನೀರಿನ ಸದ್ಬಳಕೆಯಾಗುತ್ತದೆ. ಭತ್ತದ ಗದ್ದೆಯಲ್ಲಿ ಕಾಳು ಕಟ್ಟುವ ಹಂತದಲ್ಲಿ ಅಗತ್ಯ ತೇವಾಂಶ ಇರಬೇಕು."
+                      : "Drip irrigation in arecanut plantations prevents soil saturation while saving 35-40% water. For paddy, maintain controlled 2-3 cm standing depth during grain filling.")}
                   </p>
                 </div>
-                <div className={`crop-badge ${activeStatus.color}`}>
-                  <span className={`dot ${activeStatus.color}`} />
-                  {activeStatus.text}
-                </div>
               </div>
+            )}
 
-              {/* Moisture Progress */}
-              <div style={{ margin: '14px 0 8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 700, marginBottom: 4 }}>
-                  <span>{t.soilMoisture}</span>
-                  <span>{activeZone.soil_moisture}%</span>
+            {/* TAB: SENSORS / TELEMETRY */}
+            {tab === 'sensors' && (
+              <div className="animate-fade">
+                <div style={{ marginBottom: 16 }}>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>{t.sensorRawTitle}</h2>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-3)' }}>{t.sensorSub}</p>
                 </div>
-                <div className="mbar">
-                  <div
-                    className="mbar-fill"
-                    style={{
-                      width: `${Math.min(100, activeZone.soil_moisture)}%`,
-                      background: activeStatus.color === 'critical' ? 'var(--danger)' : (activeStatus.color === 'warning' ? 'var(--warning)' : 'var(--primary-light)')
-                    }}
-                  />
-                </div>
-              </div>
 
-              {/* Sensor Rows */}
-              <div className="metric-row">
-                <div className="metric-lbl">
-                  <span>🌡️</span>
-                  <span>{t.temperature}</span>
+                <div className="table-responsive">
+                  <table className="modern-table">
+                    <thead>
+                      <tr>
+                        <th>{t.thZone}</th>
+                        <th>{t.thCrop}</th>
+                        <th>{t.thMoist}</th>
+                        <th>{t.thTemp}</th>
+                        <th>{t.thHum}</th>
+                        <th>{t.thPump}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {farmData.zones.map(z => (
+                        <tr key={z.zone_id}>
+                          <td style={{ fontWeight: 800 }}>Zone {z.zone_id}</td>
+                          <td>{z.zone_id === 'A' ? t.paddy : (z.zone_id === 'B' ? t.arecanut : z.crop)}</td>
+                          <td style={{ fontWeight: 700, color: z.soil_moisture < 42 ? 'var(--warning)' : 'inherit' }}>
+                            {z.soil_moisture}%
+                          </td>
+                          <td>{z.temperature}°C</td>
+                          <td>{z.humidity}%</td>
+                          <td>
+                            <span className={`metric-badge ${z.irrigation ? 'good' : 'warning'}`}>
+                              <span className="status-pulse" style={{ background: z.irrigation ? 'var(--success)' : 'var(--text-muted)' }} />
+                              <span>{z.irrigation ? 'RUNNING' : 'IDLE'}</span>
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-                <div>
-                  <div className="metric-val">{activeZone.temperature}°C</div>
-                  <div className="metric-range">Normal: 22°C - 34°C</div>
-                </div>
-              </div>
 
-              <div className="metric-row">
-                <div className="metric-lbl">
-                  <span>💨</span>
-                  <span>{t.humidity}</span>
-                </div>
-                <div>
-                  <div className="metric-val">{activeZone.humidity}%</div>
-                  <div className="metric-range">Coastal standard</div>
-                </div>
-              </div>
-
-              <div className="metric-row">
-                <div className="metric-lbl">
-                  <span>⚡</span>
-                  <span>{t.irrigation}</span>
-                </div>
-                <div>
-                  <div className="metric-val" style={{ color: activeZone.irrigation ? 'var(--primary-mid)' : 'var(--text-3)' }}>
-                    {activeZone.irrigation ? t.pumpRunning : t.pumpStopped}
+                <div className="panel-card" style={{ marginTop: 20 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+                    <span style={{ color: 'var(--text-3)' }}>Digital Twin Server</span>
+                    <span style={{ fontWeight: 700, color: 'var(--primary-light)' }}>Active • Localhost:3001</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginTop: 8 }}>
+                    <span style={{ color: 'var(--text-3)' }}>Simulation Clock</span>
+                    <span style={{ fontWeight: 700 }}>Day {farmData.simulation_time?.day || 1}, {farmData.simulation_time?.hour || 11}:00</span>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Quick Action */}
-            <button
-              className={`cta-btn ${activeZone.irrigation ? 'danger' : ''}`}
-              onClick={() => togglePump(activeZone.zone_id, activeZone.irrigation)}
-              disabled={pumpLoading[activeZone.zone_id]}
-            >
-              {pumpLoading[activeZone.zone_id] ? 'Updating...' : (activeZone.irrigation ? `⏹️ ${t.turnOff}` : `▶️ ${t.turnOn}`)}
-            </button>
-          </main>
-        )}
+            {/* TAB: ASK AI / VOICE */}
+            {tab === 'ask' && (
+              <div className="animate-fade">
+                <div className="panel-card assistant-card">
+                  <h2 style={{ fontSize: '1.35rem', fontWeight: 800, marginBottom: 6 }}>{t.askTitle}</h2>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-3)', marginBottom: 24 }}>{t.askSub}</p>
 
-        {/* Tab 3: WATER (IRRIGATION) */}
-        {tab === 'water' && (
-          <main className="page-content animate-in">
-            <div className="section-lbl">💧 {t.navWater}</div>
+                  <button
+                    className={`mic-circle-btn ${isListening ? 'listening' : ''}`}
+                    onClick={startListening}
+                    title="Tap to speak"
+                  >
+                    <Icons.Mic size={30} />
+                  </button>
 
-            {/* Paddy Water Box */}
-            <div className="card">
-              <div className="irr-row">
-                <div>
-                  <div style={{ fontSize: '1rem', fontWeight: 800 }}>🌾 {t.paddy} (Zone A)</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-3)' }}>
-                    {t.soilMoisture}: <b>{zoneA.soil_moisture}%</b>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: isListening ? 'var(--danger)' : 'var(--primary)', marginBottom: 20 }}>
+                    {isListening ? t.askListening : t.askPrompt}
                   </div>
-                </div>
-                <button
-                  className={`toggle-btn ${zoneA.irrigation ? 'on' : 'off'}`}
-                  onClick={() => togglePump('A', zoneA.irrigation)}
-                  disabled={pumpLoading['A']}
-                >
-                  {zoneA.irrigation ? t.pumpRunning : t.turnOn}
-                </button>
-              </div>
 
-              <div className="mbar" style={{ marginTop: 10 }}>
-                <div
-                  className="mbar-fill"
-                  style={{
-                    width: `${Math.min(100, zoneA.soil_moisture)}%`,
-                    background: zoneA.soil_moisture < 45 ? 'var(--warning)' : 'var(--primary-light)'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Arecanut Water Box */}
-            <div className="card">
-              <div className="irr-row">
-                <div>
-                  <div style={{ fontSize: '1rem', fontWeight: 800 }}>🌴 {t.arecanut} (Zone B)</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-3)' }}>
-                    {t.soilMoisture}: <b>{zoneB.soil_moisture}%</b>
+                  <div style={{ display: 'flex', gap: 10, maxWidth: 520, margin: '0 auto' }}>
+                    <input
+                      type="text"
+                      value={askQuery}
+                      onChange={(e) => setAskQuery(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleVoiceAsk(); }}
+                      placeholder={t.inputPlaceholder}
+                      style={{
+                        flex: 1,
+                        padding: '11px 16px',
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid var(--border)',
+                        fontSize: '0.88rem',
+                        outline: 'none',
+                        background: '#FFFFFF'
+                      }}
+                    />
+                    <button
+                      className="primary-btn"
+                      onClick={() => handleVoiceAsk()}
+                      disabled={isThinking}
+                    >
+                      <Icons.Send size={15} />
+                      <span>{isThinking ? '...' : t.sendText}</span>
+                    </button>
                   </div>
+
+                  {isThinking && (
+                    <div style={{ marginTop: 20, fontSize: '0.85rem', color: 'var(--text-3)' }}>
+                      {t.askThinking}
+                    </div>
+                  )}
+
+                  {aiResponse && (
+                    <div className="chat-bubble-res">
+                      <div style={{ fontWeight: 800, color: 'var(--primary)', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Icons.Sprout size={16} />
+                        <span>SasyaMitra Advisory:</span>
+                      </div>
+                      {aiResponse}
+                    </div>
+                  )}
                 </div>
-                <button
-                  className={`toggle-btn ${zoneB.irrigation ? 'on' : 'off'}`}
-                  onClick={() => togglePump('B', zoneB.irrigation)}
-                  disabled={pumpLoading['B']}
-                >
-                  {zoneB.irrigation ? t.pumpRunning : t.turnOn}
-                </button>
               </div>
+            )}
 
-              <div className="mbar" style={{ marginTop: 10 }}>
-                <div
-                  className="mbar-fill"
-                  style={{
-                    width: `${Math.min(100, zoneB.soil_moisture)}%`,
-                    background: zoneB.soil_moisture < 35 ? 'var(--danger)' : (zoneB.soil_moisture < 45 ? 'var(--warning)' : 'var(--primary-light)')
-                  }}
-                />
-              </div>
-            </div>
+          </div>
+        </main>
 
-            {/* Coastal Water Recommendation */}
-            <div className="card" style={{ background: 'var(--bg-muted)' }}>
-              <h4 style={{ fontSize: '0.88rem', fontWeight: 700, marginBottom: 6 }}>💡 {t.appSub} Advisory</h4>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-2)', lineHeight: 1.6 }}>
-                {lang === 'ml'
-                  ? "അടയ്ക്ക തോട്ടത്തിൽ വേനൽക്കാലത്ത് തുള്ളിനന (Drip irrigation) നൽകുന്നത് 40% വരെ വെള്ളം ലാഭിക്കും. നെല്ലിന് തണ്ടുകളുണ്ടാകുന്ന ഘട്ടത്തിൽ 2-3 സെ.മീ വെള്ളം നിലനിർത്തുക."
-                  : (lang === 'kn'
-                  ? "ಅಡಿಕೆ ತೋಟಕ್ಕೆ ಹನಿ ನೀರಾವರಿ ಬಳಸುವುದರಿಂದ ಶೇಕಡಾ 40 ರಷ್ಟು ನೀರು ಉಳಿತಾಯವಾಗುತ್ತದೆ. ಭತ್ತದ ಗದ್ದೆಯಲ್ಲಿ ತೆನೆ ಬಿಡುವ ಹಂತದಲ್ಲಿ 2-3 ಸೆಂ.ಮೀ ನೀರು ನಿಲ್ಲಿಸುವುದು ಸೂಕ್ತ."
-                  : "Drip irrigation for Arecanut during dry spells saves up to 40% water. For paddy, maintain a steady 2-3 cm shallow water layer during panicle initiation.")}
-              </p>
-            </div>
-          </main>
-        )}
-
-        {/* Tab 4: SENSORS (RAW TELEMETRY FOR DEV FARMERS) */}
-        {tab === 'sensors' && (
-          <main className="page-content animate-in">
-            <div className="section-lbl">📊 {t.sensorRawTitle}</div>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-3)', marginBottom: 12 }}>
-              {t.sensorSub}
-            </p>
-
-            <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-              <table className="stbl">
-                <thead>
-                  <tr>
-                    <th>{t.thZone}</th>
-                    <th>{t.thCrop}</th>
-                    <th>{t.thMoist}</th>
-                    <th>{t.thTemp}</th>
-                    <th>{t.thHum}</th>
-                    <th>{t.thPump}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {farmData.zones.map(z => (
-                    <tr key={z.zone_id}>
-                      <td style={{ fontWeight: 800 }}>{z.zone_id}</td>
-                      <td>{z.zone_id === 'A' ? (lang === 'ml' ? 'നെല്ല്' : (lang === 'kn' ? 'ಭತ್ತ' : 'Paddy')) : (z.zone_id === 'B' ? (lang === 'ml' ? 'അടയ്ക്ക' : (lang === 'kn' ? 'ಅಡಿಕೆ' : 'Arecanut')) : z.crop)}</td>
-                      <td style={{ fontWeight: 700, color: z.soil_moisture < 40 ? 'var(--warning)' : 'inherit' }}>
-                        {z.soil_moisture}%
-                      </td>
-                      <td>{z.temperature}°C</td>
-                      <td>{z.humidity}%</td>
-                      <td>
-                        <span className={`dot ${z.irrigation ? 'good' : 'warning'}`} style={{ marginRight: 4 }} />
-                        {z.irrigation ? 'ON' : 'OFF'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Simulation Clock & Backend Telemetry */}
-            <div className="card" style={{ marginTop: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-2)' }}>
-                <span>Backend Twin Status:</span>
-                <span style={{ color: 'var(--primary-mid)', fontWeight: 700 }}>● Connected (Port 3001)</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-2)', marginTop: 8 }}>
-                <span>Simulated Time:</span>
-                <span>Day {farmData.simulation_time?.day || 1}, {farmData.simulation_time?.hour || 10}:00</span>
-              </div>
-            </div>
-          </main>
-        )}
-
-        {/* Tab 5: ASK (VOICE & AI ADVISOR) */}
-        {tab === 'ask' && (
-          <main className="page-content animate-in">
-            <div className="section-lbl">🎙️ {t.askTitle}</div>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-3)', marginBottom: 20 }}>
-              {t.askSub}
-            </p>
-
-            <div className="card" style={{ textAlign: 'center', padding: '24px 16px' }}>
-              <button
-                className={`mic-btn ${isListening ? 'listening' : ''}`}
-                onClick={startListening}
-                title="Tap to speak"
-              >
-                🎙️
-              </button>
-
-              <div style={{ marginTop: 14, fontSize: '0.85rem', fontWeight: 700, color: isListening ? 'var(--danger)' : 'var(--primary)' }}>
-                {isListening ? t.askListening : t.askPrompt}
-              </div>
-
-              {/* Input for typing fallback */}
-              <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
-                <input
-                  type="text"
-                  value={askQuery}
-                  onChange={(e) => setAskQuery(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') handleVoiceAsk(); }}
-                  placeholder={t.inputPlaceholder}
-                  style={{
-                    flex: 1,
-                    padding: '10px 14px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1.5px solid var(--border)',
-                    fontSize: '0.85rem',
-                    outline: 'none'
-                  }}
-                />
-                <button
-                  className="hero-btn"
-                  style={{ width: 'auto', padding: '10px 18px' }}
-                  onClick={() => handleVoiceAsk()}
-                  disabled={isThinking}
-                >
-                  {isThinking ? '...' : t.sendText}
-                </button>
-              </div>
-
-              {/* AI Response Display */}
-              {isThinking && (
-                <div style={{ marginTop: 16, fontSize: '0.85rem', color: 'var(--text-3)' }}>
-                  ⏳ {t.askThinking}
-                </div>
-              )}
-
-              {aiResponse && (
-                <div className="voice-response">
-                  <div style={{ fontWeight: 800, color: 'var(--primary)', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span>🌱</span>
-                    <span>SasyaMitra Advisory:</span>
-                  </div>
-                  {aiResponse}
-                </div>
-              )}
-            </div>
-          </main>
-        )}
-
-        {/* Bottom Tab Navigation */}
-        <nav className="bottom-nav">
-          <button
-            className={`nav-item ${tab === 'home' ? 'active' : ''}`}
-            onClick={() => setTab('home')}
-          >
-            <span className="nav-icon">🏠</span>
-            <span className="nav-label">{t.navHome}</span>
+        {/* Mobile Bottom Navigation (Hidden on Desktop) */}
+        <nav className="bottom-nav-mobile">
+          <button className={`mobile-nav-item ${tab === 'home' ? 'active' : ''}`} onClick={() => setTab('home')}>
+            <Icons.Home size={20} />
+            <span>{t.navHome}</span>
           </button>
-
-          <button
-            className={`nav-item ${tab === 'crops' ? 'active' : ''}`}
-            onClick={() => setTab('crops')}
-          >
-            <span className="nav-icon">🌾</span>
-            <span className="nav-label">{t.navCrops}</span>
+          <button className={`mobile-nav-item ${tab === 'crops' ? 'active' : ''}`} onClick={() => setTab('crops')}>
+            <Icons.Sprout size={20} />
+            <span>{t.navCrops}</span>
           </button>
-
-          <button
-            className={`nav-item ${tab === 'water' ? 'active' : ''}`}
-            onClick={() => setTab('water')}
-          >
-            <span className="nav-icon">💧</span>
-            <span className="nav-label">{t.navWater}</span>
+          <button className={`mobile-nav-item ${tab === 'water' ? 'active' : ''}`} onClick={() => setTab('water')}>
+            <Icons.Droplets size={20} />
+            <span>{t.navWater}</span>
           </button>
-
-          <button
-            className={`nav-item ${tab === 'sensors' ? 'active' : ''}`}
-            onClick={() => setTab('sensors')}
-          >
-            <span className="nav-icon">📊</span>
-            <span className="nav-label">{t.navSensors}</span>
+          <button className={`mobile-nav-item ${tab === 'sensors' ? 'active' : ''}`} onClick={() => setTab('sensors')}>
+            <Icons.Activity size={20} />
+            <span>{t.navSensors}</span>
           </button>
-
-          <button
-            className={`nav-item ${tab === 'ask' ? 'active' : ''}`}
-            onClick={() => setTab('ask')}
-          >
-            <span className="nav-icon">🎙️</span>
-            <span className="nav-label">{t.navAsk}</span>
+          <button className={`mobile-nav-item ${tab === 'ask' ? 'active' : ''}`} onClick={() => setTab('ask')}>
+            <Icons.Mic size={20} />
+            <span>{t.navAsk}</span>
           </button>
         </nav>
       </div>
