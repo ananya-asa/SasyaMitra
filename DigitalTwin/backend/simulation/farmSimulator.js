@@ -423,6 +423,10 @@ function tickSimulation() {
     };
   });
 
+  if (state.demo_scene) {
+    paintDemoScene(state, state.demo_scene);
+  }
+
   saveState();
   return state;
 }
@@ -502,6 +506,63 @@ function predictTomorrowOutcome(zoneId) {
   };
 }
 
+function paintDemoScene(state, scene) {
+  const s = (scene || '').toUpperCase();
+  if (!s || s === 'LIVE' || s === 'NONE') return;
+  const paddy = state.zones.find(z => z.zone_id === 'A');
+  const areca = state.zones.find(z => z.zone_id === 'B');
+  const apply = (zone, moisture, temp, hum, irrigation, alert, forecast) => {
+    if (!zone) return;
+    zone.soil_moisture = moisture;
+    zone.temperature = temp;
+    zone.humidity = hum;
+    zone.irrigation = irrigation;
+    zone.alert = alert;
+    zone.weather_forecast = forecast;
+  };
+  if (s === 'DRY') {
+    state.weather.condition = 'SUNNY';
+    state.weather.barometric_pressure = 1012;
+    apply(paddy, 28, 31, 55, false, 'NEEDS_WATER', 'STABLE');
+    apply(areca, 22, 32, 52, false, 'NEEDS_WATER', 'STABLE');
+  } else if (s === 'HAPPY') {
+    state.weather.condition = 'SUNNY';
+    state.weather.barometric_pressure = 1014;
+    apply(paddy, 72, 27, 68, false, 'NONE', 'STABLE');
+    apply(areca, 52, 27, 65, false, 'NONE', 'STABLE');
+  } else if (s === 'RAIN') {
+    state.weather.condition = 'RAINY';
+    state.weather.barometric_pressure = 1004;
+    apply(paddy, 80, 25, 88, false, 'NONE', 'RAIN_COMING');
+    apply(areca, 62, 25, 86, false, 'NONE', 'RAIN_COMING');
+  } else if (s === 'STORM') {
+    state.weather.condition = 'STORM';
+    state.weather.barometric_pressure = 988;
+    apply(paddy, 82, 24, 92, false, 'NONE', 'STORM_ALERT');
+    apply(areca, 64, 24, 90, false, 'NONE', 'STORM_ALERT');
+  } else if (s === 'FUNGAL') {
+    state.weather.condition = 'CLOUDY';
+    state.weather.barometric_pressure = 1010;
+    apply(paddy, 70, 28, 92, false, 'NONE', 'STABLE');
+    apply(areca, 50, 27, 90, false, 'NONE', 'STABLE');
+  }
+}
+
+function applyDemoScene(scene) {
+  const state = loadState();
+  const s = (scene || 'LIVE').toUpperCase();
+  if (s === 'LIVE' || s === 'NONE') {
+    state.demo_scene = null;
+    addLog('[DEMO] Live data restored');
+  } else {
+    state.demo_scene = s;
+    paintDemoScene(state, s);
+    addLog(`[DEMO] Scene set to ${s}`);
+  }
+  saveState();
+  return true;
+}
+
 module.exports = {
   loadState,
   saveState,
@@ -509,5 +570,6 @@ module.exports = {
   setWeatherCondition,
   tickSimulation,
   ingestEsp32Telemetry,
-  predictTomorrowOutcome
+  predictTomorrowOutcome,
+  applyDemoScene
 };
