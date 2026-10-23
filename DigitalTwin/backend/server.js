@@ -368,6 +368,7 @@ Current Farm State:
 Analyze the live sensor data of the farm and answer the farmer's question.
 If the farmer asks in Malayalam, reply in Malayalam.
 If the farmer asks in Kannada, reply in Kannada.
+If the farmer asks in Hindi, reply in Hindi.
 Otherwise, reply in English.
 IMPORTANT: Respond immediately and directly with the final answer. Do NOT output any thinking, reasoning, or <think> tags.
 If the user is just saying hello, greeting you, or introducing themselves, reply with a warm, friendly greeting and ask how you can help them, without analyzing the crop or sensor data unless they specifically ask.
@@ -411,6 +412,7 @@ ${contextStr}`
 Analyze the live sensor data of the farm and answer the farmer's question.
 If the farmer asks in Malayalam, reply in Malayalam.
 If the farmer asks in Kannada, reply in Kannada.
+If the farmer asks in Hindi, reply in Hindi.
 Otherwise, reply in English.
 IMPORTANT: Respond immediately and directly with the final answer. Do NOT output any thinking, reasoning, or <think> tags.
 If the user is just saying hello, greeting you, or introducing themselves, reply with a warm, friendly greeting and ask how you can help them, without analyzing the crop or sensor data unless they specifically ask.
@@ -451,6 +453,7 @@ ${contextStr}`
       let targetLang = 'en-IN';
       if (lang === 'ml') targetLang = 'ml-IN';
       else if (lang === 'kn') targetLang = 'kn-IN';
+      else if (lang === 'hi') targetLang = 'hi-IN';
 
       const ttsResponse = await fetch('https://api.sarvam.ai/text-to-speech', {
         method: 'POST',
@@ -462,7 +465,7 @@ ${contextStr}`
           text: aiResponse,
           target_language_code: targetLang,
           speaker: 'shubh',
-          model: 'bulbul:v3'
+          model: 'bulbul:v4-flash'
         }),
         signal: AbortSignal.timeout(10000)
       });
