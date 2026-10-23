@@ -203,6 +203,66 @@ class Localization {
       AppLanguage.ml: 'സ്മാർട്ട് ട്രിഗർ മോഡ്',
       AppLanguage.kn: 'ಸ್ಮಾರ್ಟ್ ಟ್ರಿಗರ್ ಮೋಡ್'
     },
+    'sasya_mitra': {
+      AppLanguage.en: 'SasyaMitra',
+      AppLanguage.ml: 'സസ്യമിത്ര',
+      AppLanguage.kn: 'ಸಸ್ಯಮಿತ್ರ'
+    },
+    'coastal_assistant': {
+      AppLanguage.en: 'Coastal Farm Assistant',
+      AppLanguage.ml: 'തീരദേശ കർഷക സഹായി',
+      AppLanguage.kn: 'ಕರಾವಳಿ ರೈತ ಸಹಾಯಕ'
+    },
+    'your_farm_today': {
+      AppLanguage.en: 'YOUR FARM TODAY',
+      AppLanguage.ml: 'ഇന്നത്തെ കൃഷിനില',
+      AppLanguage.kn: 'ಇಂದಿನ ಕೃಷಿ ಸ್ಥಿತಿ'
+    },
+    'crops_healthy': {
+      AppLanguage.en: 'Crops are healthy and growing well',
+      AppLanguage.ml: 'വിളകൾ ആരോഗ്യകരമായി വളരുന്നു',
+      AppLanguage.kn: 'ಬೆಳೆಗಳು ಆರೋಗ್ಯಕರವಾಗಿ ಬೆಳೆಯುತ್ತಿವೆ'
+    },
+    'attention_needed': {
+      AppLanguage.en: 'Attention Needed',
+      AppLanguage.ml: 'ശ്രദ്ധിക്കേണ്ട കാര്യം',
+      AppLanguage.kn: 'ಗಮನಿಸಬೇಕಾದ ಅಂಶ'
+    },
+    'paddy': {
+      AppLanguage.en: 'Paddy',
+      AppLanguage.ml: 'നെല്ല്',
+      AppLanguage.kn: 'ಭತ್ತ'
+    },
+    'arecanut': {
+      AppLanguage.en: 'Arecanut',
+      AppLanguage.ml: 'അടയ്ക്ക',
+      AppLanguage.kn: 'ಅಡಿಕೆ'
+    },
+    'my_crops': {
+      AppLanguage.en: 'My Crops',
+      AppLanguage.ml: 'എന്റെ വിളകൾ',
+      AppLanguage.kn: 'ನನ್ನ ಬೆಳೆಗಳು'
+    },
+    'water_advice': {
+      AppLanguage.en: 'See Watering Advice',
+      AppLanguage.ml: 'നനയ്ക്കൽ നിർദ്ദേശം',
+      AppLanguage.kn: 'ನೀರಾವರಿ ಸಲಹೆ'
+    },
+    'open_farm': {
+      AppLanguage.en: 'Open Farm →',
+      AppLanguage.ml: 'വിശദാംശങ്ങൾ →',
+      AppLanguage.kn: 'ವಿವರಗಳು →'
+    },
+    'optimal': {
+      AppLanguage.en: 'Optimal',
+      AppLanguage.ml: 'നല്ല നില',
+      AppLanguage.kn: 'ಉತ್ತಮ'
+    },
+    'needs_water': {
+      AppLanguage.en: 'Needs Water',
+      AppLanguage.ml: 'നനയ്ക്കണം',
+      AppLanguage.kn: 'ನೀರು ಬೇಕು'
+    },
   };
 
   static String translate(String key, AppLanguage lang) {
