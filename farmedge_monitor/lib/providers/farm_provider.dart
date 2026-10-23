@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/constants/app_constants.dart';
+import '../core/farm/crop_id.dart';
+import '../core/farm/farmer_state.dart';
 import '../models/farm_status.dart';
 import '../services/esp32_api_service.dart';
 
@@ -61,7 +63,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       pollingSeconds: 1,
       darkMode: true,
       temperatureUnit: TemperatureUnit.celsius,
-      language: AppLanguage.en,
+      language: AppLanguage.kn,
       smartTriggerMode: 'AUTOMATED',
       loaded: false,
     );
@@ -77,7 +79,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         prefs.getString('temperatureUnit') ?? TemperatureUnit.celsius.name,
       ),
       language: AppLanguage.values.byName(
-        prefs.getString('language') ?? AppLanguage.en.name,
+        prefs.getString('language') ?? AppLanguage.kn.name,
       ),
       smartTriggerMode: prefs.getString('smartTriggerMode') ?? 'AUTOMATED',
       loaded: true,
@@ -134,7 +136,10 @@ class FarmSample {
 class FarmState {
   const FarmState({
     required this.status,
+    required this.paddyStatus,
+    required this.arecaStatus,
     required this.history,
+    required this.pressureHistory,
     required this.isOnline,
     required this.isLoading,
     required this.lastError,
@@ -142,16 +147,32 @@ class FarmState {
   });
 
   final FarmStatus? status;
+  final FarmStatus? paddyStatus;
+  final FarmStatus? arecaStatus;
   final List<FarmSample> history;
+  final List<double> pressureHistory;
   final bool isOnline;
   final bool isLoading;
   final String? lastError;
   final DateTime? lastPollAt;
 
+  FarmerFarmState get farmer {
+    return FarmerFarmState.fromStatuses(
+      paddyStatus: paddyStatus ?? status,
+      arecaStatus: arecaStatus,
+      pressureHistory: pressureHistory,
+      isOnline: isOnline,
+      forceDemo: !isOnline,
+    );
+  }
+
   factory FarmState.initial() {
     return const FarmState(
       status: null,
+      paddyStatus: null,
+      arecaStatus: null,
       history: [],
+      pressureHistory: [],
       isOnline: false,
       isLoading: true,
       lastError: null,
@@ -161,7 +182,10 @@ class FarmState {
 
   FarmState copyWith({
     FarmStatus? status,
+    FarmStatus? paddyStatus,
+    FarmStatus? arecaStatus,
     List<FarmSample>? history,
+    List<double>? pressureHistory,
     bool? isOnline,
     bool? isLoading,
     String? lastError,
@@ -170,7 +194,10 @@ class FarmState {
   }) {
     return FarmState(
       status: status ?? this.status,
+      paddyStatus: paddyStatus ?? this.paddyStatus,
+      arecaStatus: arecaStatus ?? this.arecaStatus,
       history: history ?? this.history,
+      pressureHistory: pressureHistory ?? this.pressureHistory,
       isOnline: isOnline ?? this.isOnline,
       isLoading: isLoading ?? this.isLoading,
       lastError: clearError ? null : lastError ?? this.lastError,
@@ -194,7 +221,13 @@ class FarmNotifier extends StateNotifier<FarmState> {
     if (!settings.loaded) return;
     try {
       final service = Esp32ApiService(baseUrl: settings.baseUrl);
-      final status = await service.fetchStatus();
+      final results = await Future.wait([
+        service.fetchStatus(zone: CropId.paddy.zoneId),
+        service.fetchStatus(zone: CropId.arecanut.zoneId),
+      ]);
+      final paddy = results[0];
+      final areca = results[1];
+      final status = paddy;
       final history = [
         ...state.history,
         FarmSample(
@@ -205,11 +238,20 @@ class FarmNotifier extends StateNotifier<FarmState> {
           battery: status.battery,
         ),
       ];
+      final pressureHistory = [
+        ...state.pressureHistory,
+        status.pressure,
+      ];
       state = state.copyWith(
         status: status,
+        paddyStatus: paddy,
+        arecaStatus: areca,
         history: history.length > AppConstants.chartWindow
             ? history.sublist(history.length - AppConstants.chartWindow)
             : history,
+        pressureHistory: pressureHistory.length > 12
+            ? pressureHistory.sublist(pressureHistory.length - 12)
+            : pressureHistory,
         isOnline: true,
         isLoading: false,
         clearError: true,

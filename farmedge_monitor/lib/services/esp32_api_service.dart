@@ -8,8 +8,11 @@ class Esp32ApiService {
 
   final Dio _dio;
 
-  Future<FarmStatus> fetchStatus() async {
-    final response = await _dio.get<Map<String, dynamic>>('/status');
+  Future<FarmStatus> fetchStatus({String zone = 'A'}) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/status',
+      queryParameters: {'zone': zone},
+    );
     final data = response.data;
     if (data == null) {
       throw StateError('ESP32 returned an empty response.');
