@@ -921,20 +921,22 @@ class _TelemetryGrid extends StatelessWidget {
         icon: Icons.coronavirus_outlined,
         color: (status?.fungalRiskLevel == 'HIGH')
             ? AppTheme.danger
-            : (status?.fungalRiskLevel == 'MODERATE'
+            : (status?.fungalRiskLevel == 'WATCH'
                 ? AppTheme.warning
                 : AppTheme.success),
         tabColor: (status?.fungalRiskLevel == 'HIGH')
             ? AppTheme.danger
-            : (status?.fungalRiskLevel == 'MODERATE'
+            : (status?.fungalRiskLevel == 'WATCH'
                 ? AppTheme.warning
                 : AppTheme.success),
-        badgeText: (status?.fungalRiskLevel == 'HIGH') ? 'SPRAY ALERT' : null,
+        badgeText: (status?.fungalRiskLevel == 'HIGH')
+            ? 'SPRAY ALERT'
+            : (status?.fungalRiskLevel == 'WATCH' ? 'INCUBATING' : null),
         subtext: (status?.fungalRiskLevel == 'HIGH')
-            ? 'Koleroga / Blast risk'
-            : (status?.fungalRiskLevel == 'MODERATE'
-                ? 'Elevated canopy RH'
-                : 'Spores suppressed'),
+            ? 'Sustained ${status?.fungalHoursSustained.toStringAsFixed(1) ?? "1.5"}h >88%'
+            : (status?.fungalRiskLevel == 'WATCH'
+                ? 'Canopy dampness rising'
+                : 'Spores dormant (<78%)'),
       ),
     ];
 

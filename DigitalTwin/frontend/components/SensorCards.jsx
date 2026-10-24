@@ -16,14 +16,18 @@ export default function SensorCards({ zone }) {
   const isHeatAlert = alert === 'HEAT_WARNING' || temperature > 38;
   const isDry = soil_moisture < 30;
 
-  // Fungal disease risk (Koleroga in Arecanut, Blast in Paddy)
-  const isHighFungalRisk = humidity >= 88;
-  const isModFungalRisk = humidity >= 78 && humidity < 88;
-  const fungalStatus = isHighFungalRisk
-    ? { level: 'HIGH RISK', text: 'Koleroga / Blast Alert', advisory: 'Spray 1% Bordeaux mixture', class: 'badge-red', glow: '0 0 20px rgba(239, 68, 68, 0.2)', color: 'var(--danger)' }
-    : isModFungalRisk
-      ? { level: 'MODERATE', text: 'High Canopy Moisture', advisory: 'Inspect areca fruit bunches', class: 'badge-yellow', glow: 'none', color: '#f59e0b' }
-      : { level: 'LOW RISK', text: 'Pathogen Suppressed', advisory: 'Spores dormant (<78% RH)', class: 'badge-green', glow: 'none', color: 'var(--primary)' };
+  // Fungal disease risk (Anti-jitter sustained duration: LOW / WATCH / HIGH)
+  const backendFungalRisk = zone.fungal_risk || (humidity >= 88 ? 'HIGH' : humidity >= 78 ? 'WATCH' : 'LOW');
+  const hoursSustained = zone.fungal_hours_sustained !== undefined ? zone.fungal_hours_sustained : (humidity >= 88 ? 2.0 : 0.0);
+  
+  const isHighFungal = backendFungalRisk === 'HIGH';
+  const isWatchFungal = backendFungalRisk === 'WATCH';
+  
+  const fungalStatus = isHighFungal
+    ? { level: 'HIGH', text: 'Koleroga / Blast Alert', advisory: `Sustained wetness (${hoursSustained}h). Spray 1% Bordeaux`, class: 'badge-red', glow: '0 0 20px rgba(239, 68, 68, 0.2)', color: 'var(--danger)' }
+    : isWatchFungal
+      ? { level: 'WATCH', text: 'Pre-Spore Incubation', advisory: `Canopy damp (${hoursSustained}h). Monitor fruit bunches`, class: 'badge-yellow', glow: 'none', color: '#f59e0b' }
+      : { level: 'LOW', text: 'Pathogen Dormant', advisory: 'Spores suppressed (<78% RH)', class: 'badge-green', glow: 'none', color: 'var(--primary)' };
 
   // Compute status messages and colors
   const moistureStatus = isIrrigationOn 
@@ -174,13 +178,13 @@ export default function SensorCards({ zone }) {
         position: 'relative',
         overflow: 'hidden',
         boxShadow: fungalStatus.glow,
-        borderColor: isHighFungalRisk ? 'var(--danger)' : 'var(--border-color)',
-        animation: isHighFungalRisk ? 'pulse-water-card 2.5s infinite' : 'none'
+        borderColor: isHighFungal ? 'var(--danger)' : 'var(--border-color)',
+        animation: isHighFungal ? 'pulse-water-card 2.5s infinite' : 'none'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
           <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: '500' }}>Fungal Pathogen Risk</span>
           <div style={{
-            background: isHighFungalRisk ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.12)',
+            background: isHighFungal ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.12)',
             padding: '8px',
             borderRadius: '10px',
             color: fungalStatus.color

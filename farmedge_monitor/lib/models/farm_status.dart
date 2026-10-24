@@ -40,6 +40,31 @@ class FarmStatus {
   final bool apiRain;
   final String smartTriggerMode;
   final String alert;
+  final String? fungalRisk;
+  final double fungalHoursSustained;
+
+  const FarmStatus({
+    required this.temperature,
+    required this.humidity,
+    required this.soilMoisture,
+    required this.battery,
+    required this.pump,
+    required this.rain,
+    required this.cropStress,
+    required this.pressure,
+    required this.weatherForecast,
+    required this.weatherSource,
+    required this.batteryHoursRemaining,
+    required this.currentDraw,
+    required this.lastUpdated,
+    required this.apiTemperature,
+    required this.apiHumidity,
+    required this.apiRain,
+    required this.smartTriggerMode,
+    required this.alert,
+    this.fungalRisk,
+    this.fungalHoursSustained = 0.0,
+  });
 
   factory FarmStatus.fromJson(Map<String, dynamic> json) {
     return FarmStatus(
@@ -72,6 +97,9 @@ class FarmStatus {
       smartTriggerMode: json['smartTriggerMode'] as String? ?? 
                         json['smart_trigger_mode'] as String? ?? 'AUTOMATED',
       alert: json['alert'] as String? ?? 'NONE',
+      fungalRisk: json['fungal_risk'] as String? ?? json['fungalRisk'] as String?,
+      fungalHoursSustained: (json['fungal_hours_sustained'] as num?)?.toDouble() ?? 
+                            (json['fungalHoursSustained'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
@@ -104,20 +132,26 @@ class FarmStatus {
   }
 
   String get fungalRiskLevel {
+    if (fungalRisk != null && fungalRisk!.isNotEmpty) {
+      return fungalRisk!.toUpperCase();
+    }
     if (humidity >= 88 && temperature >= 22 && temperature <= 35) {
       return 'HIGH';
     } else if (humidity >= 78) {
-      return 'MODERATE';
+      return 'WATCH';
     }
     return 'LOW';
   }
 
   String get fungalAdvisory {
     if (fungalRiskLevel == 'HIGH') {
-      return 'Critical Koleroga / Blast risk. Apply 1% Bordeaux mixture before rain.';
-    } else if (fungalRiskLevel == 'MODERATE') {
-      return 'Elevated humidity: Inspect arecanut bunches and paddy canopy.';
+      final hoursStr = fungalHoursSustained > 0
+          ? '${fungalHoursSustained.toStringAsFixed(1)}h'
+          : '≥1.5h';
+      return 'Sustained incubation ($hoursStr). Critical Koleroga / Blast risk. Apply 1% Bordeaux spray before rain.';
+    } else if (fungalRiskLevel == 'WATCH') {
+      return 'Canopy wetness building up. Spores activating. Inspect arecanut bunches.';
     }
-    return 'Optimal microclimate: Spore germination suppressed.';
+    return 'Optimal microclimate: Spore germination suppressed (<78% RH).';
   }
 }

@@ -405,6 +405,22 @@ function tickSimulation() {
       nextAlert = 'NONE';
     }
 
+    // Sustained Fungal Incubation Tracking (Anti-Jitter / Leaf Wetness Duration)
+    const isFavorable = (zoneHum >= 88.0 && zoneTemp >= 22.0 && zoneTemp <= 35.0);
+    let consecutiveTicks = zone.fungal_consecutive_ticks || 0;
+    if (isFavorable) {
+      consecutiveTicks += 1;
+    } else {
+      consecutiveTicks = Math.max(0, consecutiveTicks - 1);
+    }
+    const hoursSustained = parseFloat((consecutiveTicks * 0.25).toFixed(1)); // each tick is 15 min = 0.25h
+    let fungalRisk = 'LOW';
+    if (consecutiveTicks >= 6) { // >= 1.5 hours of continuous high humidity
+      fungalRisk = 'HIGH';
+    } else if (consecutiveTicks >= 2) { // 30 mins to 1.5 hours
+      fungalRisk = 'WATCH';
+    }
+
     return {
       ...zone,
       temperature: zoneTemp,
@@ -413,6 +429,9 @@ function tickSimulation() {
       soil_moisture: nextMoisture,
       irrigation: isIrrigating,
       alert: nextAlert,
+      fungal_consecutive_ticks: consecutiveTicks,
+      fungal_hours_sustained: hoursSustained,
+      fungal_risk: fungalRisk,
       battery_capacity_mah: parseFloat(nextCapacity.toFixed(1)),
       current_draw_ma: currentDraw,
       battery_time_remaining_hours: timeRemaining,
@@ -519,6 +538,19 @@ function paintDemoScene(state, scene) {
     zone.irrigation = irrigation;
     zone.alert = alert;
     zone.weather_forecast = forecast;
+    if (hum >= 88) {
+      zone.fungal_consecutive_ticks = 8;
+      zone.fungal_hours_sustained = 2.0;
+      zone.fungal_risk = 'HIGH';
+    } else if (hum >= 78) {
+      zone.fungal_consecutive_ticks = 3;
+      zone.fungal_hours_sustained = 0.8;
+      zone.fungal_risk = 'WATCH';
+    } else {
+      zone.fungal_consecutive_ticks = 0;
+      zone.fungal_hours_sustained = 0.0;
+      zone.fungal_risk = 'LOW';
+    }
   };
   if (s === 'DRY') {
     state.weather.condition = 'SUNNY';
