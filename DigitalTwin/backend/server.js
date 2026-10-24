@@ -222,93 +222,74 @@ app.post('/api/simulation-speed', (req, res) => {
 function detectLanguage(text) {
   const hasMalayalam = /[\u0D00-\u0D7F]/.test(text);
   const hasKannada = /[\u0C80-\u0CFF]/.test(text);
+  const hasHindi = /[\u0900-\u097F]/.test(text);
   
-  const mlKeywords = ["തക്കാളി", "വെള്ളം", "രോഗം", "കാലാവസ്ഥ", "മേഖല", "ചെടി", "എങ്ങനെ"];
-  const knKeywords = ["ಬೆಳೆ", "ನೀರು", "ರೋಗ", "ಹೇಗಿದೆ", "ವಲಯ", "ಕೃಷಿ", "ತಾಪಮಾನ"];
+  const mlKeywords = ["നെല്ല്", "അടയ്ക്ക", "വെള്ളം", "രോഗം", "കാലാവസ്ഥ", "മേഖല", "ചെടി", "എങ്ങനെ"];
+  const knKeywords = ["ಬತ್ತ", "ಅಡಿಕೆ", "ನೀರು", "ರೋಗ", "ಹೇಗಿದೆ", "ವಲಯ", "ಕೃಷಿ", "ತಾಪಮಾನ"];
+  const hiKeywords = ["धान", "सुपारी", "फसल", "पानी", "मौसम", "तापमान", "कैसी"];
   
   const textLower = text.toLowerCase();
   if (hasMalayalam || mlKeywords.some(k => textLower.includes(k))) return 'ml';
   if (hasKannada || knKeywords.some(k => textLower.includes(k))) return 'kn';
+  if (hasHindi || hiKeywords.some(k => textLower.includes(k))) return 'hi';
   return 'en';
 }
-function generateNlgResponse(zone, weather, lang, question) {
-  const crop = zone.crop;
-  const soil = zone.soil_moisture;
-  const temp = zone.temperature;
-  const hum = zone.humidity;
-  const sprinkler = zone.irrigation;
-  
-  const questionLower = question.toLowerCase();
-  const weatherKeys = ["weather", "climate", "temp", "temperature", "rain", "hot", "cold", "കാലാവസ്ഥ", "ചൂട്", "തണുപ്പ്", "മഴ", "ಹವಾಮಾನ", "ತಾಪಮಾನ", "ಮಳೆ"];
-  const waterKeys = ["water", "irrigate", "sprinkler", "wet", "dry", "moisture", "വെള്ളം", "നനയ്ക്കുക", "ഈർപ്പം", "നീരു", "ತೇವಾಂಶ"];
-  const diseaseKeys = ["disease", "health", "sick", "fungus", "pest", "safe", "രോഗം", "ചെടി", "കേട്", "സുരക്ഷിതം", "ಬೆಳೆ", "ರೋಗ", "ಉಪದ್ರವ", "ಸುರಕ್ಷಿತ"];
-  
-  const greetingKeys = ["hello", "hi", "hey", "namaste", "ഹലോ", "ഹായ്", "ഹേയ്", "നമസ്കാരം", "ಹಲೋ", "ಹಾಯ್", "ಹೇ", "ನಮಸ್ಕಾರ"];
-  let intent = "SUMMARY";
-  if (greetingKeys.some(k => questionLower.includes(k))) intent = "GREETING";
-  else if (weatherKeys.some(k => questionLower.includes(k))) intent = "WEATHER";
-  else if (waterKeys.some(k => questionLower.includes(k))) intent = "WATER";
-  else if (diseaseKeys.some(k => questionLower.includes(k))) intent = "DISEASE";
-  
-  const isDry = soil < 35;
-  const isSaturated = soil > 70;
-  const isHighRisk = (temp > 35 || hum > 80);
-  
-  // Translate Zone ID for Malayalam and Kannada speech
-  const mlZoneId = zone.zone_id === 'A' ? 'എ' : (zone.zone_id === 'B' ? 'ബി' : 'സി');
-  const knZoneId = zone.zone_id === 'A' ? 'ಎ' : (zone.zone_id === 'B' ? 'ಬಿ' : 'ಸಿ');
-  
-  if (lang === 'ml') {
-    if (intent === 'GREETING') {
-      return "ഹലോ! ഞാൻ നിങ്ങളുടെ അഗ്രോണമിസ്റ്റ് സഹായിയാണ്. ഇന്ന് നിങ്ങളുടെ വിളയെ പരിപാലിക്കുന്നതിനോ സെൻസർ വിവരങ്ങൾ കാണുന്നതിനോ എനിക്ക് എങ്ങനെ സഹായിക്കാനാകും?";
-    } else if (intent === 'WEATHER') {
-      return `ഇപ്പോഴത്തെ കാലാവസ്ഥ ${weather.condition} ആണ്. അന്തരീക്ഷ ഊഷ്മാവ് ${temp} ഡിഗ്രി രേഖപ്പെടുത്തിയിട്ടുണ്ട്.`;
-    } else if (intent === 'WATER') {
-      const statusText = isDry ? "വളരെ കുറവാണ്" : (isSaturated ? "വളരെ കൂടുതലാണ്" : "ആവശ്യത്തിനുണ്ട്");
-      const sprinklerText = sprinkler ? "ഓട്ടോമാറ്റിക് സ്പ്രിംഗ്ലർ ഇപ്പോൾ ഓൺ ആണ്." : "സ്പ്രിംഗ്ലർ പമ്പുകൾ ഇപ്പോൾ ഓഫ് ആണ്.";
-      return `മേഖല ${mlZoneId} ലെ മണ്ണിലെ ഈർപ്പം ${soil} ശതമാനം ആണ്. ഇത് വിളകൾക്ക് ${statusText}. ${sprinklerText}`;
-    } else if (intent === 'DISEASE') {
-      const riskText = isHighRisk ? "വളരെ കൂടുതലാണ്. ഇലകൾ ചീയുന്നതിനെതിരെ പ്രതിരോധ നടപടികൾ എടുക്കുക." : "വളരെ കുറവാണ്. വിളകൾ സുരക്ഷിതമാണ്.";
-      return `മേഖല ${mlZoneId} ലെ ചൂടും ഈർപ്പവും വിലയിരുത്തുമ്പോൾ വിളകൾക്ക് രോഗബാധ ഉണ്ടാകാനുള്ള സാധ്യത ${riskText}`;
-    } else {
-      const cropAdvice = isDry ? `മേഖല ${mlZoneId} ലെ ${crop} വിളകൾ വരണ്ട അവസ്ഥയിലാണ്. മണ്ണിലെ ഈർപ്പം ${soil} ശതമാനം ആണ്.` : `മേഖല ${mlZoneId} ലെ വിളകൾ ആരോഗ്യത്തോടെയിരിക്കുന്നു. ഈർപ്പം ${soil} ശതമാനം ആണ്.`;
-      const actionAdvice = sprinkler ? "ഓട്ടോമാറ്റിക് സ്പ്രിംഗ്ലർ ഇപ്പോൾ പ്രവർത്തിക്കുന്നുണ്ട്." : "വാൽവ് ഇപ്പോൾ ഓഫ് ആണ്.";
-      return `${cropAdvice} ${actionAdvice}`;
+
+function generateNlgResponse(zones, weather, lang, question) {
+  const zoneA = (zones && zones.find(z => z.zone_id === 'A')) || (zones && zones[0]) || { crop: 'Paddy', soil_moisture: 65, temperature: 27, irrigation: false, alert: 'NONE' };
+  const zoneB = (zones && zones.find(z => z.zone_id === 'B')) || (zones && zones[1]) || { crop: 'Arecanut', soil_moisture: 55, temperature: 28, irrigation: false, alert: 'NONE' };
+
+  const questionLower = (question || "").toLowerCase();
+  const isPaddyQuery = questionLower.includes('paddy') || questionLower.includes('rice') || questionLower.includes('zone a') || questionLower.includes('നെല്ല്') || questionLower.includes('ഭത്ത') || questionLower.includes('ಬತ್ತ') || questionLower.includes('ಧಾನ್');
+  const isArecaQuery = questionLower.includes('arecanut') || questionLower.includes('betel') || questionLower.includes('zone b') || questionLower.includes('അടയ്ക്ക') || questionLower.includes('കമുക്') || questionLower.includes('ಅಡಿಕೆ') || questionLower.includes('ಸುಪಾರಿ');
+
+  const greetingKeys = ["hello", "hi", "hey", "namaste", "ഹലോ", "ഹായ്", "ഹേയ്", "നമസ്കാരം", "ಹಲೋ", "ಹಾಯ್", "ಹೇ", "ನಮಸ್ಕಾರ", "नमस्ते"];
+  const isGreeting = greetingKeys.some(k => questionLower.includes(k));
+
+  if (lang === 'kn') {
+    if (isGreeting) {
+      return `ನಮಸ್ಕಾರ! ಸಸ್ಯಮಿತ್ರ ಕೃಷಿ ಸಹಾಯಕ್ಕೆ ಸ್ವಾಗತ. ನಿಮ್ಮ ಭತ್ತ (ವಲಯ A) ಮತ್ತು ಅಡಿಕೆ (ವಲಯ B) ತೋಟದ ಸ್ಥಿತಿಗತಿಯನ್ನು ನಾನು ತಿಳಿಸಬಲ್ಲೆ.`;
     }
-  } else if (lang === 'kn') {
-    if (intent === 'GREETING') {
-      return "ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಕೃಷಿ ಸಲಹೆಗಾರ ಸಹಾಯಕ. ಇಂದು ನಿಮ್ಮ ಬೆಳೆ ನಿರ್ವಹಣೆ ಅಥವಾ ಸೆನ್ಸರ್ ಮಾಹಿತಿ ವೀಕ್ಷಿಸಲು ನಾನು ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?";
-    } else if (intent === 'WEATHER') {
-      return `ಸದ್ಯದ ಹವಾಮಾನವು ${weather.condition} ಆಗಿದೆ. ತಾಪಮಾನವು ${temp} ಡಿಗ್ರಿ ಸೆಲ್ಸಿಯಸ್ ದಾಖಲಾಗಿದೆ.`;
-    } else if (intent === 'WATER') {
-      const statusText = isDry ? "ಅತ್ಯಂತ ಕಡಿಮೆಯಿದೆ" : (isSaturated ? "ಅತಿಯಾಗಿದೆ" : "ಸೂಕ್ತವಾಗಿದೆ");
-      const sprinklerText = sprinkler ? "ಸ್ಪ್ರಿಂಕ್ಲರ್ ಪಂಪ್ ಈಗ ಚಾಲನೆಯಲ್ಲಿದೆ." : "ಸ್ಪ್ರಿಂಕ್ಲರ್ ವಾಲ್ವ್ ಈಗ ಬಂದ್ ಆಗಿದೆ.";
-      return `ವಲಯ ${knZoneId} ರ ಮಣ್ಣಿನ ತೇವಾಂಶವು ${soil} ಶೇಕಡಾ ಆಗಿದೆ. ಇದು ಬೆಳೆಗಳಿಗೆ ${statusText}. ${sprinklerText}`;
-    } else if (intent === 'DISEASE') {
-      const riskText = isHighRisk ? "ಹೆಚ್ಚಾಗಿದೆ. ಶಿಲೀಂಧ್ರ ಹರಡದಂತೆ ಮುನ್ನೆಚ್ಚರಿಕೆ ವಹಿಸಿ." : "ಅತ್ಯಂತ ಕಡಿಮೆಯಿದೆ. ಬೆಳೆಗಳು ಸುರಕ್ಷಿತವಾಗಿವೆ.";
-      return `ವಲಯ ${knZoneId} ರ ತಾಪಮಾನ ಮತ್ತು ಆರ್ದ್ರತೆಯ ಆಧಾರದ ಮೇಲೆ ಬೆಳೆಗಳಿಗೆ ರೋಗ ತಗಲುವ ಅಪಾಯ ${riskText}`;
-    } else {
-      const cropAdvice = isDry ? `ವಲಯ ${knZoneId} ನಲ್ಲಿರುವ ${crop} ಬೆಳೆ ಒಣಗುತ್ತಿದೆ. ಮಣ್ಣಿನ ತೇವಾಂಶ ${soil} ಶೇಕಡಾ ಆಗಿದೆ.` : `ವಲಯ ${knZoneId} ರ ಬೆಳೆಗಳು ಆರೋಗ್ಯಕರವಾಗಿದ್ದು, ಮಣ್ಣಿನ ತೇವಾಂಶ ಸೂಕ್ತವಾಗಿದೆ.`;
-      const actionAdvice = sprinkler ? "ಸ್ಪ್ರಿಂಕ್ಲರ್ ಪಂಪ್ ಈಗ ಚಾಲನೆಯಲ್ಲಿದೆ." : "ಸ್ಪ್ರಿಂಕ್ಲರ್ ವಾಲ್ವ್ ಈಗ ಬಂದ್ ಆಗಿದೆ.";
-      return `${cropAdvice} ${actionAdvice}`;
+    if (isArecaQuery) {
+      return `ವಲಯ B ಯಲ್ಲಿರುವ ಅಡಿಕೆ ಬೆಳೆಗೆ ಮಣ್ಣಿನ ತೇವಾಂಶ ${zoneB.soil_moisture}% ಮತ್ತು ತಾಪಮಾನ ${zoneB.temperature}°C ಇದೆ. ${zoneB.irrigation ? 'ನೀರು ಸರಬರಾಜು ಚಾಲನೆಯಲ್ಲಿದೆ.' : (zoneB.soil_moisture < 35 ? 'ತೇವಾಂಶ ಕಡಿಮೆಯಿದೆ, ನೀರುಣಿಸುವುದು ಉತ್ತಮ.' : 'ಬೆಳೆ ಸುರಕ್ಷಿತವಾಗಿದೆ.')}`;
     }
+    if (isPaddyQuery) {
+      return `ವಲಯ A ಯಲ್ಲಿರುವ ಭತ್ತದ ಬೆಳೆಗೆ ಮಣ್ಣಿನ ತೇವಾಂಶ ${zoneA.soil_moisture}% ಮತ್ತು ತಾಪಮಾನ ${zoneA.temperature}°C ಇದೆ. ${zoneA.irrigation ? 'ಪಂಪ್ ಚಾಲನೆಯಲ್ಲಿದೆ.' : (zoneA.soil_moisture < 50 ? 'ನೀರಿನ ಪ್ರಮಾಣ ಕಡಿಮೆಯಿದೆ, ನೀರುಣಿಸಿ.' : 'ಸ್ಥಿತಿ ಉತ್ತಮವಾಗಿದೆ.')}`;
+    }
+    return `ನಿಮ್ಮ ತೋಟದಲ್ಲಿ ಭತ್ತದ (ವಲಯ A) ತೇವಾಂಶ ${zoneA.soil_moisture}% ಮತ್ತು ಅಡಿಕೆಯ (ವಲಯ B) ತೇವಾಂಶ ${zoneB.soil_moisture}% ಇದೆ. ಹವಾಮಾನವು ${weather.condition} ಆಗಿದೆ.`;
+  } else if (lang === 'ml') {
+    if (isGreeting) {
+      return `നമസ്കാരം! സസുമിത്ര ഫാം സഹായിയിലേക്ക് സ്വാഗതം. നിങ്ങളുടെ നെല്ല് (മേഖല A), അടയ്ക്ക (മേഖല B) തോട്ടങ്ങളുടെ വിവരങ്ങൾ ഞാൻ പറഞ്ഞുതരാം.`;
+    }
+    if (isArecaQuery) {
+      return `മേഖല B യിലെ അടയ്ക്ക തോട്ടത്തിൽ മണ്ണിലെ ഈർപ്പം ${zoneB.soil_moisture}% ആണ്. ${zoneB.irrigation ? 'നനയ്ക്കൽ നടക്കുന്നു.' : (zoneB.soil_moisture < 35 ? 'ഈർപ്പം കുറവാണ്, നനയ്ക്കുന്നത് നന്നായിരിക്കും.' : 'വിള സുരക്ഷിതമാണ്.')}`;
+    }
+    if (isPaddyQuery) {
+      return `മേഖല A യിലെ നെൽകൃഷിയിൽ മണ്ണിലെ ഈർപ്പം ${zoneA.soil_moisture}% ആണ്. ${zoneA.irrigation ? 'പമ്പ് പ്രവർത്തിക്കുന്നു.' : (zoneA.soil_moisture < 50 ? 'വെള്ളം കുറവാണ്, പമ്പ് ഓൺ ചെയ്യുക.' : 'നില മികച്ചതാണ്.')}`;
+    }
+    return `നിങ്ങളുടെ തോട്ടത്തിൽ നെല്ലിന്റെ ഈർപ്പം ${zoneA.soil_moisture}% ഉം അടയ്ക്കയുടെ ഈർപ്പം ${zoneB.soil_moisture}% ഉം ആണ്. ഇപ്പോഴത്തെ കാലാവസ്ഥ ${weather.condition} ആണ്.`;
+  } else if (lang === 'hi') {
+    if (isGreeting) {
+      return `नमस्ते किसान भाई! सस्यमित्र सहायक में आपका स्वागत है। मैं आपके धान (जोन A) और सुपारी (जोन B) की वास्तविक स्थिति बता सकता हूँ।`;
+    }
+    if (isArecaQuery) {
+      return `जोन B में सुपारी की फसल में नमी ${zoneB.soil_moisture}% और तापमान ${zoneB.temperature}°C है। ${zoneB.irrigation ? 'सिंचाई चालू है।' : (zoneB.soil_moisture < 35 ? 'नमी कम है, सिंचाई की सलाह दी जाती है।' : 'फसल स्वस्थ है।')}`;
+    }
+    if (isPaddyQuery) {
+      return `जोन A में धान की फसल में नमी ${zoneA.soil_moisture}% और तापमान ${zoneA.temperature}°C है। ${zoneA.irrigation ? 'पंप चालू है।' : (zoneA.soil_moisture < 50 ? 'पानी की आवश्यकता है।' : 'स्थिति अनुकूल है।')}`;
+    }
+    return `आपके खेत में धान (जोन A) की नमी ${zoneA.soil_moisture}% और अरेकानट (जोन B) की नमी ${zoneB.soil_moisture}% है। मौसम ${weather.condition} है।`;
   } else {
-    if (intent === 'GREETING') {
-      return "Hello! I am your AI Agronomist assistant. How can I help you manage your crop or view sensor details today?";
-    } else if (intent === 'WEATHER') {
-      return `The current weather conditions are ${weather.condition}. The local temperature is ${temp} degrees.`;
-    } else if (intent === 'WATER') {
-      const statusText = isDry ? "critically dry" : (isSaturated ? "waterlogged" : "optimal");
-      const sprinklerText = sprinkler ? "The automated sprinkler pump is active." : "The irrigation system is standby.";
-      return `Soil moisture in Zone ${zone.zone_id} is ${soil} percent, which is ${statusText} for your ${crop}. ${sprinklerText}`;
-    } else if (intent === 'DISEASE') {
-      const riskText = isHighRisk ? "high risk of fungal pathogens. Check crop leaves for spots." : "low risk. Crop leaves show normal chlorophyll health.";
-      return `Based on temperature (${temp}C) and humidity (${hum}%) in Zone ${zone.zone_id}, there is a ${riskText}`;
-    } else {
-      const cropAdvice = isDry ? `Your ${crop} crop in Zone ${zone.zone_id} is water-stressed with critical ${soil} percent moisture.` : `Your ${crop} crop in Zone ${zone.zone_id} is healthy, and the soil moisture is stable at ${soil} percent.`;
-      const actionAdvice = sprinkler ? "The automated sprinkler pump is active." : "The irrigation system is standby.";
-      return `${cropAdvice} ${actionAdvice}`;
+    if (isGreeting) {
+      return `Hello! Welcome to SasyaMitra. I can give you real-time updates on your Paddy in Zone A and Arecanut in Zone B. How can I help?`;
     }
+    if (isArecaQuery) {
+      return `In Zone B, your Arecanut plantation has ${zoneB.soil_moisture}% soil moisture at ${zoneB.temperature}°C. ${zoneB.irrigation ? 'Irrigation is currently active.' : (zoneB.soil_moisture < 35 ? 'Soil is getting dry, irrigation is recommended.' : 'Moisture is healthy.')}`;
+    }
+    if (isPaddyQuery) {
+      return `In Zone A, your Paddy field has ${zoneA.soil_moisture}% soil moisture at ${zoneA.temperature}°C. ${zoneA.irrigation ? 'The water pump is actively running.' : (zoneA.soil_moisture < 50 ? 'Moisture is below optimal for paddy, consider pumping water.' : 'Crop condition is optimal.')}`;
+    }
+    return `On your farm, Zone A Paddy is at ${zoneA.soil_moisture}% moisture (${zoneA.crop_health}), and Zone B Arecanut is at ${zoneB.soil_moisture}% moisture (${zoneB.crop_health}). The weather is ${weather.condition}.`;
   }
 }
 
@@ -320,30 +301,36 @@ app.get('/api/voice-chat', async (req, res) => {
   }
 
   const state = simulator.loadState();
-  const queryLower = query.toLowerCase();
-
-  // Dynamically detect which zone the user is asking about
-  let selectedZoneId = 'A'; // Default
-  
-  if (queryLower.includes('zone b') || queryLower.includes('field b') || queryLower.includes('crop b') || queryLower.includes('ബി') || queryLower.includes('വലയ ബി')) {
-    selectedZoneId = 'B';
-  } else if (queryLower.includes('zone c') || queryLower.includes('field c') || queryLower.includes('crop c') || queryLower.includes('സി') || queryLower.includes('വലയ സി')) {
-    selectedZoneId = 'C';
-  }
-
-  const zone = state.zones.find(z => z.zone_id === selectedZoneId) || state.zones[0];
+  const zoneA = (state.zones && state.zones.find(z => z.zone_id === 'A')) || state.zones[0];
+  const zoneB = (state.zones && state.zones.find(z => z.zone_id === 'B')) || state.zones[1] || zoneA;
   const weather = state.weather;
   const lang = detectLanguage(query);
 
   const contextStr = `
-Current Farm State:
-- Crop Type: ${zone.crop} (Zone ${zone.zone_id})
-- Soil Moisture: ${zone.soil_moisture}%
-- Local Temperature: ${zone.temperature} C
-- Relative Humidity: ${zone.humidity}%
-- Irrigation State: ${zone.irrigation ? 'ON' : 'OFF'}
-- Active Warning: ${zone.alert}
-- General Climate: ${weather.condition}
+GROUND-TRUTH FARM CONTEXT:
+Platform: SasyaMitra Smart Agri-Digital Twin
+General Weather: ${weather.condition}, Ambient Temp: ${weather.ambient_temperature || weather.temperature}°C, Humidity: ${weather.ambient_humidity || weather.humidity}%, Barometric Pressure: ${weather.barometric_pressure} hPa
+
+CROPS ON THIS FARM (STRICTLY ONLY PADDY AND ARECANUT):
+1. ZONE A - PADDY (Rice Field):
+   - Crop: Paddy
+   - Soil Moisture: ${zoneA.soil_moisture}% (Optimal range: 60% - 80%; critically dry if below 40%)
+   - Field Temperature: ${zoneA.temperature}°C
+   - Humidity: ${zoneA.humidity}%
+   - Irrigation Pump: ${zoneA.irrigation ? 'ACTIVE (PUMPING WATER)' : 'OFF (STANDBY)'}
+   - Edge Crop Health (XGBoost): ${zoneA.crop_health}
+   - Weather Forecast: ${zoneA.weather_forecast || 'STABLE'}
+   - Alert Status: ${zoneA.alert}
+
+2. ZONE B - ARECANUT (Betel Nut Plantation):
+   - Crop: Arecanut
+   - Soil Moisture: ${zoneB.soil_moisture}% (Optimal range: 45% - 65%; critically dry if below 30%)
+   - Field Temperature: ${zoneB.temperature}°C
+   - Humidity: ${zoneB.humidity}%
+   - Irrigation Valve: ${zoneB.irrigation ? 'ACTIVE (IRRIGATING)' : 'OFF (STANDBY)'}
+   - Edge Crop Health (XGBoost): ${zoneB.crop_health}
+   - Weather Forecast: ${zoneB.weather_forecast || 'STABLE'}
+   - Alert Status: ${zoneB.alert}
 `;
 
   let aiResponse = null;
@@ -364,24 +351,39 @@ Current Farm State:
           messages: [
             {
               role: 'system',
-              content: `You are a helpful, warm, and friendly AI Agronomist chatbot. 
-Analyze the live sensor data of the farm and answer the farmer's question.
-If the farmer asks in Malayalam, reply in Malayalam.
-If the farmer asks in Kannada, reply in Kannada.
-If the farmer asks in Hindi, reply in Hindi.
-Otherwise, reply in English.
-IMPORTANT: Respond immediately and directly with the final answer. Do NOT output any thinking, reasoning, or <think> tags.
-If the user is just saying hello, greeting you, or introducing themselves, reply with a warm, friendly greeting and ask how you can help them, without analyzing the crop or sensor data unless they specifically ask.
-Keep your response concise (maximum 3 sentences) and highly practical.
+              content: `You are "SasyaMitra Farm Copilot" — an expert AI agronomist dedicated to this specific farm.
+MANDATORY RULES:
+1. CROPS ON THIS FARM: This farm has ONLY TWO crops:
+   - Zone A is PADDY (Rice)
+   - Zone B is ARECANUT (Betel nut plantation)
+   EXACT CROP NAMES PER LANGUAGE (Use ONLY these words):
+   - English: "Paddy" (Zone A) and "Arecanut" (Zone B).
+   - Kannada: "ಭತ್ತ" (Zone A) and "ಅಡಿಕೆ" (Zone B). Never say ಗೋಧಿ or ತೆಂಗು!
+   - Malayalam: "നെല്ല്" (Zone A) and "അടയ്ക്ക" (Zone B).
+   - Hindi: "धान" (Zone A) and "सुपारी" (Zone B).
+2. STRICT DATA ACCURACY:
+   - Quote the EXACT live sensor numbers provided in the telemetry above (e.g. "${zoneA.soil_moisture}% for Paddy", "${zoneB.soil_moisture}% for Arecanut").
+   - If the user asks generally ("how are my crops?", "farm status?"), report on BOTH Paddy (Zone A) and Arecanut (Zone B) with their live moisture and health.
+   - If the user asks specifically about Paddy, focus on Zone A.
+   - If the user asks specifically about Arecanut, focus on Zone B.
+3. CONVERSATIONAL TONE & VOICE FORMATTING:
+   - Keep answers concise: 2 to 3 sentences maximum.
+   - Respond directly without preamble (do NOT say "since you asked in Kannada I will reply in Kannada").
+   - No asterisks (*), markdown formatting, bold text, or bullet points, because your output will be directly read aloud by Text-to-Speech!
+4. LANGUAGE:
+   - If user asks in Malayalam, reply in natural, fluent Malayalam.
+   - If user asks in Kannada, reply in natural, fluent Kannada.
+   - If user asks in Hindi, reply in natural, fluent Hindi.
+   - Otherwise, reply in English.
 
 ${contextStr}`
             },
             { role: 'user', content: query }
           ],
-          temperature: 0.7,
-          max_tokens: 300
+          temperature: 0.6,
+          max_tokens: 250
         }),
-        signal: AbortSignal.timeout(3500)
+        signal: AbortSignal.timeout(4000)
       });
 
       if (response.status === 200) {
@@ -408,22 +410,12 @@ ${contextStr}`
           messages: [
             {
               role: 'system',
-              content: `You are a helpful, warm, and friendly AI Agronomist chatbot. 
-Analyze the live sensor data of the farm and answer the farmer's question.
-If the farmer asks in Malayalam, reply in Malayalam.
-If the farmer asks in Kannada, reply in Kannada.
-If the farmer asks in Hindi, reply in Hindi.
-Otherwise, reply in English.
-IMPORTANT: Respond immediately and directly with the final answer. Do NOT output any thinking, reasoning, or <think> tags.
-If the user is just saying hello, greeting you, or introducing themselves, reply with a warm, friendly greeting and ask how you can help them, without analyzing the crop or sensor data unless they specifically ask.
-Keep your response concise (maximum 3 sentences) and highly practical.
-
-${contextStr}`
+              content: `You are SasyaMitra Farm Copilot. This farm strictly has only Paddy (Zone A) and Arecanut (Zone B). Answer concisely in 2 sentences based on this live telemetry:\n${contextStr}`
             },
             { role: 'user', content: query }
           ],
-          temperature: 0.7,
-          max_tokens: 300,
+          temperature: 0.6,
+          max_tokens: 200,
           stream: false
         }),
         signal: AbortSignal.timeout(3000)
@@ -441,7 +433,7 @@ ${contextStr}`
 
   // 3. Fallback to local rule-based NLG
   if (!aiResponse) {
-    aiResponse = generateNlgResponse(zone, weather, lang, query);
+    aiResponse = generateNlgResponse(state.zones, weather, lang, query);
   }
 
   // 4. Try Sarvam TTS if API key is configured
