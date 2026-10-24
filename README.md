@@ -38,9 +38,9 @@
 
 **PS: Edge-Based Crop Monitoring with TinyML.**
 
-Most "smart farming" systems send sensor data to the cloud, wait for a decision, and send a command back. In rural areas, where internet is unreliable, that design fails exactly when it is needed. Advice is also usually generic, written for a district rather than for one field, and dashboards are in English only.
+Farmers lose crops to water wastage, fungal diseases that are noticed too late, and delays in reaching reliable farm services such as sprayers and labourers. In coastal Karnataka the monsoon brings heavy disease pressure on arecanut  and paddy, and rural internet is unreliable, so cloud-only tools fail when they are needed most.
 
-SasyaMitra moves the intelligence to the farm. The ESP32 reads the sensors and makes irrigation and storm decisions locally. The cloud is used only for extras (weather fusion, language models, speech), never for the critical loop.
+SasyaMitra uses an ESP32, sensors, edge ML and a Digital Twin to monitor soil conditions, optimise irrigation, and warn farmers when weather conditions favour fungal disease. Sensing, risk scoring and irrigation control run on the device, so essential monitoring continues even when the internet is down.
 
 ##  What makes it different
 
