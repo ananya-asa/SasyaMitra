@@ -360,7 +360,7 @@ Current Farm State:
           'Authorization': `Bearer ${groqApiKey}`
         },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
+          model: 'qwen/qwen3.8-27b',
           messages: [
             {
               role: 'system',
@@ -465,7 +465,7 @@ ${contextStr}`
           text: aiResponse,
           target_language_code: targetLang,
           speaker: 'shubh',
-          model: 'bulbul:v4-flash'
+          model: 'bulbul:v3'
         }),
         signal: AbortSignal.timeout(10000)
       });
