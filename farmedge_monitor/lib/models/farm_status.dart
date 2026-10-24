@@ -1,27 +1,6 @@
 enum CropStress { low, medium, high, unknown }
 
 class FarmStatus {
-  const FarmStatus({
-    required this.temperature,
-    required this.humidity,
-    required this.soilMoisture,
-    required this.battery,
-    required this.pump,
-    required this.rain,
-    required this.cropStress,
-    required this.pressure,
-    required this.weatherForecast,
-    required this.weatherSource,
-    required this.batteryHoursRemaining,
-    required this.currentDraw,
-    required this.lastUpdated,
-    required this.apiTemperature,
-    required this.apiHumidity,
-    required this.apiRain,
-    required this.smartTriggerMode,
-    required this.alert,
-  });
-
   final double temperature;
   final double humidity;
   final double soilMoisture;

@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import pandas as pd
-import xgboost as xgb
+import xgboost as xgb  # Native XGBoost Engine
 
 # =========================================================================
 # OFFICIAL NATIVE XGBOOST MULTI-CLASS CLASSIFIER FOR CROP STRESS
