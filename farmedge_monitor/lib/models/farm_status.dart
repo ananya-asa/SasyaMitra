@@ -102,4 +102,22 @@ class FarmStatus {
       CropStress.unknown => 0,
     };
   }
+
+  String get fungalRiskLevel {
+    if (humidity >= 88 && temperature >= 22 && temperature <= 35) {
+      return 'HIGH';
+    } else if (humidity >= 78) {
+      return 'MODERATE';
+    }
+    return 'LOW';
+  }
+
+  String get fungalAdvisory {
+    if (fungalRiskLevel == 'HIGH') {
+      return 'Critical Koleroga / Blast risk. Apply 1% Bordeaux mixture before rain.';
+    } else if (fungalRiskLevel == 'MODERATE') {
+      return 'Elevated humidity: Inspect arecanut bunches and paddy canopy.';
+    }
+    return 'Optimal microclimate: Spore germination suppressed.';
+  }
 }

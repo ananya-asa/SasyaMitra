@@ -43,7 +43,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   void _showTomorrowPrediction(BuildContext context) {
     final status = ref.read(farmProvider).status;
     final forecast = status?.weatherForecast ?? 'STABLE';
-    
+
     showDialog<void>(
       context: context,
       builder: (context) {
@@ -52,7 +52,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             children: [
               Icon(Icons.psychology, color: AppTheme.success),
               SizedBox(width: 10),
-              Text('Edge ML Weather Predictor', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('Edge ML Weather Predictor',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
             ],
           ),
           content: Column(
@@ -65,11 +66,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
               const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: forecast == 'STORM_ALERT'
                       ? AppTheme.danger.withOpacity(0.12)
-                      : (forecast == 'RAIN_COMING' ? AppTheme.warning.withOpacity(0.12) : AppTheme.success.withOpacity(0.12)),
+                      : (forecast == 'RAIN_COMING'
+                          ? AppTheme.warning.withOpacity(0.12)
+                          : AppTheme.success.withOpacity(0.12)),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -77,21 +81,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     Icon(
                       forecast == 'STORM_ALERT'
                           ? Icons.warning_amber_rounded
-                          : (forecast == 'RAIN_COMING' ? Icons.cloud_queue : Icons.wb_sunny_outlined),
+                          : (forecast == 'RAIN_COMING'
+                              ? Icons.cloud_queue
+                              : Icons.wb_sunny_outlined),
                       color: forecast == 'STORM_ALERT'
                           ? AppTheme.danger
-                          : (forecast == 'RAIN_COMING' ? AppTheme.warning : AppTheme.success),
+                          : (forecast == 'RAIN_COMING'
+                              ? AppTheme.warning
+                              : AppTheme.success),
                     ),
                     const SizedBox(width: 10),
                     Text(
                       forecast == 'STORM_ALERT'
                           ? 'STORM ALERT'
-                          : (forecast == 'RAIN_COMING' ? 'RAIN EXPECTED' : 'STABLE WEATHER'),
+                          : (forecast == 'RAIN_COMING'
+                              ? 'RAIN EXPECTED'
+                              : 'STABLE WEATHER'),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: forecast == 'STORM_ALERT'
                             ? AppTheme.danger
-                            : (forecast == 'RAIN_COMING' ? AppTheme.warning : AppTheme.success),
+                            : (forecast == 'RAIN_COMING'
+                                ? AppTheme.warning
+                                : AppTheme.success),
                       ),
                     ),
                   ],
@@ -126,15 +138,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final status = farm.status;
     final apiTemperature = status?.temperature ?? 0.0;
     final csvTemperature = status?.temperature ?? 0.0;
-    
-    final tempVal = settings.temperatureUnit == TemperatureUnit.celsius 
-        ? apiTemperature 
+
+    final tempVal = settings.temperatureUnit == TemperatureUnit.celsius
+        ? apiTemperature
         : (apiTemperature * 9 / 5) + 32;
-    final csvTempVal = settings.temperatureUnit == TemperatureUnit.celsius 
-        ? csvTemperature 
+    final csvTempVal = settings.temperatureUnit == TemperatureUnit.celsius
+        ? csvTemperature
         : (csvTemperature * 9 / 5) + 32;
 
-    final tempUnit = settings.temperatureUnit == TemperatureUnit.celsius ? '°C' : '°F';
+    final tempUnit =
+        settings.temperatureUnit == TemperatureUnit.celsius ? '°C' : '°F';
     final lang = settings.language;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -176,9 +189,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             const SizedBox(height: 16),
                             _StormAlertBanner(),
                           ],
+                          if (status?.fungalRiskLevel == 'HIGH') ...[
+                            const SizedBox(height: 16),
+                            _FungalAlertBanner(advisory: status?.fungalAdvisory ?? ''),
+                          ],
                           if (status?.alert == 'NEEDS_WATER') ...[
                             const SizedBox(height: 16),
-                            _IrrigationConfirmBanner(moisture: status?.soilMoisture ?? 0.0),
+                            _IrrigationConfirmBanner(
+                                moisture: status?.soilMoisture ?? 0.0),
                           ],
                           const SizedBox(height: 20),
                           _HeroOverview(
@@ -199,13 +217,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                 tempUnit: tempUnit,
                                 onViewAll: () => context.go('/details'),
                                 language: lang,
-                                onWeatherTap: () => _showTomorrowPrediction(context),
+                                onWeatherTap: () =>
+                                    _showTomorrowPrediction(context),
                               );
                               final sectorView = SizedBox(
                                 height: wide ? 210 : 320,
                                 child: _LiveSectorView(status: status),
                               );
-                              
+
                               if (wide) {
                                 return Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,16 +249,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           LayoutBuilder(
                             builder: (context, constraints) {
                               final wide = constraints.maxWidth >= 980;
-                              final stressPanel = _CropStressPanel(status: status, language: lang);
-                              final trendsPanel = _TrendsPanel(history: farm.history, language: lang);
+                              final stressPanel = _CropStressPanel(
+                                  status: status, language: lang);
+                              final trendsPanel = _TrendsPanel(
+                                  history: farm.history, language: lang);
                               final sideColumn = Column(
                                 children: [
                                   _TwinSyncPanel(isOnline: farm.isOnline),
                                   const SizedBox(height: 16),
-                                  _IrrigationPipeline(isPumpActive: status?.pump ?? false),
+                                  _IrrigationPipeline(
+                                      isPumpActive: status?.pump ?? false),
                                 ],
                               );
-                              
+
                               if (wide) {
                                 return Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -283,23 +305,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             builder: (_) => const VoiceAssistantDialog(),
           );
         },
-        icon: Icon(
-          Icons.spa_rounded, 
-          color: isDark ? AppTheme.success : const Color(0xFF1E3A2B)
-        ),
-        label: Text(
-          'Farm Copilot', 
-          style: TextStyle(
-            color: isDark ? Colors.white : const Color(0xFF1E3A2B),
-            fontWeight: FontWeight.bold,
-          )
-        ),
+        icon: Icon(Icons.spa_rounded,
+            color: isDark ? AppTheme.success : const Color(0xFF1E3A2B)),
+        label: Text('Farm Copilot',
+            style: TextStyle(
+              color: isDark ? Colors.white : const Color(0xFF1E3A2B),
+              fontWeight: FontWeight.bold,
+            )),
         backgroundColor: isDark ? const Color(0xFF0D2419) : Colors.white,
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
           side: BorderSide(
-            color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.white.withOpacity(0.08)
+                : Colors.black.withOpacity(0.05),
           ),
         ),
       ),
@@ -334,7 +354,9 @@ class _SideNav extends StatelessWidget {
         color: isDark ? const Color(0xFF07140D) : const Color(0xFFF4F7F5),
         border: Border(
           right: BorderSide(
-            color: isDark ? Colors.white.withOpacity(0.06) : Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.white.withOpacity(0.06)
+                : Colors.black.withOpacity(0.05),
             width: 1,
           ),
         ),
@@ -348,7 +370,7 @@ class _SideNav extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'KRISHISETU',
+                'SASYAMITRA',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
@@ -404,7 +426,11 @@ class _SideNav extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: () {},
               icon: const Icon(Icons.add, color: Colors.white, size: 18),
-              label: const Text('New Crop Cycle', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+              label: const Text('New Crop Cycle',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1E3A2B),
                 padding: const EdgeInsets.symmetric(vertical: 14),
@@ -425,7 +451,9 @@ class _SideNav extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
               child: Row(
                 children: [
-                  Icon(Icons.help_outline_rounded, size: 20, color: isDark ? Colors.white60 : const Color(0xFF5A6B5D)),
+                  Icon(Icons.help_outline_rounded,
+                      size: 20,
+                      color: isDark ? Colors.white60 : const Color(0xFF5A6B5D)),
                   const SizedBox(width: 12),
                   Text(
                     'Help Support',
@@ -452,7 +480,7 @@ class _SideNav extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
@@ -461,9 +489,7 @@ class _SideNav extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: isActive
-                ? const Color(0xFF1E3A2B)
-                : Colors.transparent,
+            color: isActive ? const Color(0xFF1E3A2B) : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -522,7 +548,9 @@ class _TopBar extends StatelessWidget {
               color: isDark ? const Color(0xFF13281E) : Colors.white,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06),
+                color: isDark
+                    ? Colors.white.withOpacity(0.08)
+                    : Colors.black.withOpacity(0.06),
               ),
               boxShadow: [
                 BoxShadow(
@@ -534,13 +562,17 @@ class _TopBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                Icon(Icons.search, size: 20, color: isDark ? Colors.white38 : Colors.grey),
+                Icon(Icons.search,
+                    size: 20, color: isDark ? Colors.white38 : Colors.grey),
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
                     decoration: InputDecoration(
-                      hintText: Localization.translate('search_farm_data', language),
-                      hintStyle: TextStyle(fontSize: 13, color: isDark ? Colors.white38 : Colors.grey[400]),
+                      hintText:
+                          Localization.translate('search_farm_data', language),
+                      hintStyle: TextStyle(
+                          fontSize: 13,
+                          color: isDark ? Colors.white38 : Colors.grey[400]),
                       border: InputBorder.none,
                       isDense: true,
                     ),
@@ -557,15 +589,17 @@ class _TopBar extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: isOnline 
-                ? AppTheme.success.withOpacity(0.1) 
+            color: isOnline
+                ? AppTheme.success.withOpacity(0.1)
                 : AppTheme.danger.withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.wifi_tethering, size: 16, color: isOnline ? AppTheme.success : AppTheme.danger),
+              Icon(Icons.wifi_tethering,
+                  size: 16,
+                  color: isOnline ? AppTheme.success : AppTheme.danger),
               const SizedBox(width: 6),
               Text(
                 isOnline ? 'LIVE' : 'OFFLINE',
@@ -584,7 +618,8 @@ class _TopBar extends StatelessWidget {
         Stack(
           children: [
             IconButton(
-              icon: Icon(Icons.notifications_none_rounded, color: isDark ? Colors.white70 : Colors.black54),
+              icon: Icon(Icons.notifications_none_rounded,
+                  color: isDark ? Colors.white70 : Colors.black54),
               onPressed: () {},
             ),
             Positioned(
@@ -606,12 +641,19 @@ class _TopBar extends StatelessWidget {
         DropdownButtonHideUnderline(
           child: DropdownButton<AppLanguage>(
             value: language,
-            icon: Icon(Icons.language_rounded, color: isDark ? Colors.white70 : Colors.black54),
+            icon: Icon(Icons.language_rounded,
+                color: isDark ? Colors.white70 : Colors.black54),
             onChanged: onLanguageChanged,
             items: const [
-              DropdownMenuItem(value: AppLanguage.en, child: Text('EN', style: TextStyle(fontSize: 12))),
-              DropdownMenuItem(value: AppLanguage.ml, child: Text('ML', style: TextStyle(fontSize: 12))),
-              DropdownMenuItem(value: AppLanguage.kn, child: Text('KN', style: TextStyle(fontSize: 12))),
+              DropdownMenuItem(
+                  value: AppLanguage.en,
+                  child: Text('EN', style: TextStyle(fontSize: 12))),
+              DropdownMenuItem(
+                  value: AppLanguage.ml,
+                  child: Text('ML', style: TextStyle(fontSize: 12))),
+              DropdownMenuItem(
+                  value: AppLanguage.kn,
+                  child: Text('KN', style: TextStyle(fontSize: 12))),
             ],
           ),
         ),
@@ -620,7 +662,8 @@ class _TopBar extends StatelessWidget {
         // Profile Avatar
         CircleAvatar(
           radius: 18,
-          backgroundColor: isDark ? const Color(0xFF1E3A2B) : const Color(0xFFE4E9E6),
+          backgroundColor:
+              isDark ? const Color(0xFF1E3A2B) : const Color(0xFFE4E9E6),
           child: Text(
             'AD',
             style: TextStyle(
@@ -706,7 +749,8 @@ class _HeroOverview extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(20),
@@ -871,6 +915,27 @@ class _TelemetryGrid extends StatelessWidget {
         tabColor: AppTheme.success,
         subtext: '${status?.batteryHoursRemaining.toStringAsFixed(1)} hrs left',
       ),
+      _TelemetryItem(
+        title: 'Fungal Risk',
+        value: status?.fungalRiskLevel ?? 'LOW',
+        icon: Icons.coronavirus_outlined,
+        color: (status?.fungalRiskLevel == 'HIGH')
+            ? AppTheme.danger
+            : (status?.fungalRiskLevel == 'MODERATE'
+                ? AppTheme.warning
+                : AppTheme.success),
+        tabColor: (status?.fungalRiskLevel == 'HIGH')
+            ? AppTheme.danger
+            : (status?.fungalRiskLevel == 'MODERATE'
+                ? AppTheme.warning
+                : AppTheme.success),
+        badgeText: (status?.fungalRiskLevel == 'HIGH') ? 'SPRAY ALERT' : null,
+        subtext: (status?.fungalRiskLevel == 'HIGH')
+            ? 'Koleroga / Blast risk'
+            : (status?.fungalRiskLevel == 'MODERATE'
+                ? 'Elevated canopy RH'
+                : 'Spores suppressed'),
+      ),
     ];
 
     return Card(
@@ -885,12 +950,13 @@ class _TelemetryGrid extends StatelessWidget {
                 Text(
                   Localization.translate('telemetry_data', language),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                  ),
+                        fontWeight: FontWeight.w900,
+                      ),
                 ),
                 TextButton(
                   onPressed: onViewAll,
-                  child: Text(Localization.translate('view_all_sensors', language)),
+                  child: Text(
+                      Localization.translate('view_all_sensors', language)),
                 ),
               ],
             ),
@@ -900,17 +966,23 @@ class _TelemetryGrid extends StatelessWidget {
                 final wide = constraints.maxWidth >= 600;
                 if (wide) {
                   return Row(
-                    children: cards.map((c) => Expanded(child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: c,
-                    ))).toList(),
+                    children: cards
+                        .map((c) => Expanded(
+                                child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 6),
+                              child: c,
+                            )))
+                        .toList(),
                   );
                 } else {
                   return Column(
-                    children: cards.map((c) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: c,
-                    )).toList(),
+                    children: cards
+                        .map((c) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: c,
+                            ))
+                        .toList(),
                   );
                 }
               },
@@ -951,7 +1023,8 @@ class _TelemetryItem extends StatelessWidget {
         color: isDark ? const Color(0xFF13281E) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.06) : const Color(0xFFE4EAE6),
+          color:
+              isDark ? Colors.white.withOpacity(0.06) : const Color(0xFFE4EAE6),
         ),
         boxShadow: isDark
             ? []
@@ -1003,7 +1076,8 @@ class _TelemetryItem extends StatelessWidget {
                   const Spacer(),
                   if (badgeText != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: AppTheme.danger.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(4),
@@ -1057,8 +1131,8 @@ class _LiveSectorView extends StatelessWidget {
                 Text(
                   'Live Sector View',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                  ),
+                        fontWeight: FontWeight.w900,
+                      ),
                 ),
                 Container(
                   width: 8,
@@ -1080,16 +1154,21 @@ class _LiveSectorView extends StatelessWidget {
                     Image.network(
                       'https://images.unsplash.com/photo-1593113630400-ea4288922497?w=600&auto=format&fit=crop',
                       fit: BoxFit.cover,
-                      errorBuilder: (context, _, __) => Image.asset('assets/images/farm_hero.png', fit: BoxFit.cover),
+                      errorBuilder: (context, _, __) => Image.asset(
+                          'assets/images/farm_hero.png',
+                          fit: BoxFit.cover),
                     ),
                     Positioned(
                       left: 12,
                       right: 12,
                       bottom: 12,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: isDark ? Colors.black.withOpacity(0.85) : Colors.white.withOpacity(0.9),
+                          color: isDark
+                              ? Colors.black.withOpacity(0.85)
+                              : Colors.white.withOpacity(0.9),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
@@ -1102,7 +1181,8 @@ class _LiveSectorView extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.water,
-                              color: isPumpActive ? AppTheme.success : Colors.grey,
+                              color:
+                                  isPumpActive ? AppTheme.success : Colors.grey,
                               size: 20,
                             ),
                             const SizedBox(width: 8),
@@ -1112,11 +1192,15 @@ class _LiveSectorView extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    isPumpActive ? 'Pump Active' : 'Pump Standby',
+                                    isPumpActive
+                                        ? 'Pump Active'
+                                        : 'Pump Standby',
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.white : const Color(0xFF1E3A2B),
+                                      color: isDark
+                                          ? Colors.white
+                                          : const Color(0xFF1E3A2B),
                                     ),
                                   ),
                                   const Text(
@@ -1134,7 +1218,9 @@ class _LiveSectorView extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: isPumpActive ? AppTheme.success : Colors.grey,
+                                color: isPumpActive
+                                    ? AppTheme.success
+                                    : Colors.grey,
                               ),
                             ),
                           ],
@@ -1167,7 +1253,7 @@ class _CropStressPanel extends StatelessWidget {
         : score >= 40
             ? AppTheme.warning
             : AppTheme.success;
-            
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -1177,8 +1263,8 @@ class _CropStressPanel extends StatelessWidget {
             Text(
               Localization.translate('crop_stress_index', language),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w900,
-              ),
+                    fontWeight: FontWeight.w900,
+                  ),
             ),
             const Text(
               'AI Edge Analysis',
@@ -1196,7 +1282,9 @@ class _CropStressPanel extends StatelessWidget {
                       child: CircularProgressIndicator(
                         value: 1.0,
                         strokeWidth: 10,
-                        color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.04),
+                        color: isDark
+                            ? Colors.white.withOpacity(0.08)
+                            : Colors.black.withOpacity(0.04),
                       ),
                     ),
                     Positioned.fill(
@@ -1216,7 +1304,8 @@ class _CropStressPanel extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.w900,
-                            color: isDark ? Colors.white : const Color(0xFF1E3A2B),
+                            color:
+                                isDark ? Colors.white : const Color(0xFF1E3A2B),
                           ),
                         ),
                         Text(
@@ -1225,7 +1314,9 @@ class _CropStressPanel extends StatelessWidget {
                             fontSize: 8,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
-                            color: isDark ? Colors.white60 : const Color(0xFF5A6B5D),
+                            color: isDark
+                                ? Colors.white60
+                                : const Color(0xFF5A6B5D),
                           ),
                         ),
                       ],
@@ -1237,15 +1328,18 @@ class _CropStressPanel extends StatelessWidget {
             const SizedBox(height: 16),
             Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  score >= 70 
-                      ? Localization.translate('high', language) 
-                      : (score >= 40 ? Localization.translate('medium', language) : Localization.translate('stable', language)),
+                  score >= 70
+                      ? Localization.translate('high', language)
+                      : (score >= 40
+                          ? Localization.translate('medium', language)
+                          : Localization.translate('stable', language)),
                   style: TextStyle(
                     color: color,
                     fontSize: 11,
@@ -1289,7 +1383,8 @@ class _Finding extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: color),
           const SizedBox(width: 8),
-          Expanded(child: Text(text, style: Theme.of(context).textTheme.bodySmall)),
+          Expanded(
+              child: Text(text, style: Theme.of(context).textTheme.bodySmall)),
         ],
       ),
     );
@@ -1313,8 +1408,8 @@ class _TrendsPanel extends StatelessWidget {
             Text(
               Localization.translate('environmental_trends', language),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w900,
-              ),
+                    fontWeight: FontWeight.w900,
+                  ),
             ),
             const SizedBox(height: 16),
             SizedBox(
@@ -1330,8 +1425,12 @@ class _TrendsPanel extends StatelessWidget {
             Wrap(
               spacing: 14,
               children: [
-                _Legend(color: AppTheme.success, label: Localization.translate('soil_moisture', language)),
-                _Legend(color: AppTheme.warning, label: Localization.translate('temperature', language)),
+                _Legend(
+                    color: AppTheme.success,
+                    label: Localization.translate('soil_moisture', language)),
+                _Legend(
+                    color: AppTheme.warning,
+                    label: Localization.translate('temperature', language)),
               ],
             ),
           ],
@@ -1378,8 +1477,8 @@ class _TwinSyncPanel extends StatelessWidget {
             Text(
               'Twin Synchronization',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w900,
-              ),
+                    fontWeight: FontWeight.w900,
+                  ),
             ),
             const SizedBox(height: 16),
             _buildSyncRow(
@@ -1433,8 +1532,8 @@ class _TwinSyncPanel extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: isActive 
-                ? AppTheme.success.withOpacity(0.1) 
+            color: isActive
+                ? AppTheme.success.withOpacity(0.1)
                 : Colors.grey.withOpacity(0.1),
             borderRadius: BorderRadius.circular(4),
           ),
@@ -1470,8 +1569,8 @@ class _IrrigationPipeline extends StatelessWidget {
             Text(
               'Irrigation Pipeline',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w900,
-              ),
+                    fontWeight: FontWeight.w900,
+                  ),
             ),
             const SizedBox(height: 16),
             Row(
@@ -1515,9 +1614,13 @@ class _IrrigationPipeline extends StatelessWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: highlight 
-                ? (isActive ? const Color(0xFF1E3A2B) : Colors.grey.withOpacity(0.2))
-                : (isActive ? AppTheme.success.withOpacity(0.1) : Colors.grey.withOpacity(0.1)),
+            color: highlight
+                ? (isActive
+                    ? const Color(0xFF1E3A2B)
+                    : Colors.grey.withOpacity(0.2))
+                : (isActive
+                    ? AppTheme.success.withOpacity(0.1)
+                    : Colors.grey.withOpacity(0.1)),
             shape: BoxShape.circle,
             border: Border.all(
               color: isActive ? AppTheme.success : Colors.grey,
@@ -1526,7 +1629,7 @@ class _IrrigationPipeline extends StatelessWidget {
           ),
           child: Icon(
             icon,
-            color: highlight 
+            color: highlight
                 ? (isActive ? Colors.white : Colors.grey)
                 : (isActive ? AppTheme.success : Colors.grey),
             size: 20,
@@ -1581,6 +1684,49 @@ class _StormAlertBanner extends StatelessWidget {
                 const Text(
                   'Local Barometric pressure is dropping rapidly. Secure field assets and check drainage.',
                   style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FungalAlertBanner extends StatelessWidget {
+  const _FungalAlertBanner({required this.advisory});
+  final String advisory;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE65100).withOpacity(.15),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFFF9800), width: 1.5),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.coronavirus_outlined, color: Color(0xFFFF9800), size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'FUNGAL DISEASE RISK (KOLEROGA / BLAST ALERT)',
+                  style: TextStyle(
+                      color: Color(0xFFFFB74D),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14),
+                ),
+                Text(
+                  advisory.isNotEmpty
+                      ? advisory
+                      : 'Prolonged high humidity (>88%) detected. Critical risk of Koleroga in Arecanut and Blast in Paddy. Apply preventive Bordeaux mixture.',
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
                 ),
               ],
             ),
@@ -1653,9 +1799,11 @@ class _IrrigationConfirmBanner extends ConsumerWidget {
             style: TextButton.styleFrom(
               foregroundColor: Colors.white70,
               backgroundColor: Colors.white10,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
-            onPressed: () => ref.read(farmProvider.notifier).dismissIrrigationAlert(),
+            onPressed: () =>
+                ref.read(farmProvider.notifier).dismissIrrigationAlert(),
             child: Text(dismissText, style: const TextStyle(fontSize: 12)),
           ),
           const SizedBox(width: 8),
@@ -1663,10 +1811,14 @@ class _IrrigationConfirmBanner extends ConsumerWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.success,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
             ),
-            onPressed: () => ref.read(farmProvider.notifier).approveIrrigation(),
-            child: Text(approveText, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            onPressed: () =>
+                ref.read(farmProvider.notifier).approveIrrigation(),
+            child: Text(approveText,
+                style:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

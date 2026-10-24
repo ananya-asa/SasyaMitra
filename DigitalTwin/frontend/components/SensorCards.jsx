@@ -1,5 +1,5 @@
 import React from 'react';
-import { Thermometer, Droplets, Sprout, Sun, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Thermometer, Droplets, Sprout, Sun, AlertTriangle, RefreshCw, ShieldAlert } from 'lucide-react';
 
 export default function SensorCards({ zone }) {
   if (!zone) {
@@ -15,6 +15,15 @@ export default function SensorCards({ zone }) {
   const isIrrigationOn = irrigation === 'ON' || irrigation === true;
   const isHeatAlert = alert === 'HEAT_WARNING' || temperature > 38;
   const isDry = soil_moisture < 30;
+
+  // Fungal disease risk (Koleroga in Arecanut, Blast in Paddy)
+  const isHighFungalRisk = humidity >= 88;
+  const isModFungalRisk = humidity >= 78 && humidity < 88;
+  const fungalStatus = isHighFungalRisk
+    ? { level: 'HIGH RISK', text: 'Koleroga / Blast Alert', advisory: 'Spray 1% Bordeaux mixture', class: 'badge-red', glow: '0 0 20px rgba(239, 68, 68, 0.2)', color: 'var(--danger)' }
+    : isModFungalRisk
+      ? { level: 'MODERATE', text: 'High Canopy Moisture', advisory: 'Inspect areca fruit bunches', class: 'badge-yellow', glow: 'none', color: '#f59e0b' }
+      : { level: 'LOW RISK', text: 'Pathogen Suppressed', advisory: 'Spores dormant (<78% RH)', class: 'badge-green', glow: 'none', color: 'var(--primary)' };
 
   // Compute status messages and colors
   const moistureStatus = isIrrigationOn 
@@ -157,6 +166,38 @@ export default function SensorCards({ zone }) {
         </div>
         <div className={`badge ${lightStatus.class}`}>
           {lightStatus.text}
+        </div>
+      </div>
+
+      {/* Fungal Disease Risk Card (Koleroga / Blast Warning) */}
+      <div className="glass-card sensor-card" style={{
+        position: 'relative',
+        overflow: 'hidden',
+        boxShadow: fungalStatus.glow,
+        borderColor: isHighFungalRisk ? 'var(--danger)' : 'var(--border-color)',
+        animation: isHighFungalRisk ? 'pulse-water-card 2.5s infinite' : 'none'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+          <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: '500' }}>Fungal Pathogen Risk</span>
+          <div style={{
+            background: isHighFungalRisk ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.12)',
+            padding: '8px',
+            borderRadius: '10px',
+            color: fungalStatus.color
+          }}>
+            <ShieldAlert size={20} />
+          </div>
+        </div>
+        <div style={{ marginBottom: '8px' }}>
+          <span style={{ fontSize: '1.75rem', fontWeight: '800', color: fungalStatus.color }}>
+            {fungalStatus.level}
+          </span>
+        </div>
+        <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: '10px', minHeight: '28px' }}>
+          {fungalStatus.advisory}
+        </div>
+        <div className={`badge ${fungalStatus.class}`}>
+          {fungalStatus.text}
         </div>
       </div>
     </div>
