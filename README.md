@@ -56,7 +56,7 @@ SasyaMitra moves the intelligence to the farm. The ESP32 reads the sensors and m
 
 | Live dashboard | Digital twin |
 |---|---|
-| ![Dashboard](screenshots/dashboard.png) | ![Digital twin](screenshots/digital_twin.png) |
+| ![Dashboard](screenshots/dashboard.png) | ![Digital twin](screenshots/digital_twin1.png) |
 | Telemetry cards, crop stress index, trends, pump status, edge ML forecast | Interactive crop fields (Tomato, Rice, Wheat) with live readings and IoT gateway logs |
 
 | Multilingual voice assistant | ESP32 on Wokwi |
