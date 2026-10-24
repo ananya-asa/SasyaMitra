@@ -38,7 +38,7 @@
 
 **PS: Edge-Based Crop Monitoring with TinyML.**
 
-Farmers lose crops to water wastage, fungal diseases that are noticed too late, and delays in reaching reliable farm services such as sprayers and labourers. In coastal Karnataka the monsoon brings heavy disease pressure on arecanut (koleroga) and paddy, and rural internet is unreliable, so cloud-only tools fail when they are needed most.
+Farmers lose crops to water wastage, fungal diseases that are noticed too late, and delays in reaching reliable farm services such as sprayers and labourers. In coastal Karnataka the monsoon brings heavy disease pressure on arecanut  and paddy, and rural internet is unreliable, so cloud-only tools fail when they are needed most.
 
 SasyaMitra uses an ESP32, sensors, edge ML and a Digital Twin to monitor soil conditions, optimise irrigation, and warn farmers when weather conditions favour fungal disease. Sensing, risk scoring and irrigation control run on the device, so essential monitoring continues even when the internet is down.
 
